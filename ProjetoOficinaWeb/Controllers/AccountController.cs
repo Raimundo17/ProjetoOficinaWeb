@@ -19,6 +19,12 @@ namespace ProjetoOficinaWeb.Controllers
 
         public IActionResult Login()
         {
+
+            if (User.Identity.IsAuthenticated && this.User.IsInRole("Admin")) // se o utilizador quando fizer login já estiver autenticado
+            {
+                return this.RedirectToAction("IndexDashboard", "Home"); // DASHBOARD
+            }
+
             if (User.Identity.IsAuthenticated) // se o utilizador quando fizer login já estiver autenticado
             {
                 return this.RedirectToAction("Index", "Home"); // primeiro a action depois o controlador home
@@ -38,6 +44,11 @@ namespace ProjetoOficinaWeb.Controllers
                     if (this.Request.Query.Keys.Contains("ReturnUrl"))
                     {
                         return Redirect(this.Request.Query["ReturnUrl"].First()); // o primeiro returnUrl que encontrar
+                    }
+
+                    if(User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
+                    {
+                        return this.RedirectToAction("IndexDashboard", "Home"); // DASHBOARD
                     }
 
                     return this.RedirectToAction("Index", "Home");

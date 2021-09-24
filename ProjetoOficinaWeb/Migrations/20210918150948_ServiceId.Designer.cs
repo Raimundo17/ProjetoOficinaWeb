@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoOficinaWeb.Data;
 
 namespace ProjetoOficinaWeb.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20210918150948_ServiceId")]
+    partial class ServiceId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,10 +165,15 @@ namespace ProjetoOficinaWeb.Migrations
                     b.Property<DateTime>("RepairDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ServiceId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ServiceId");
 
                     b.HasIndex("UserId");
 
@@ -189,17 +196,12 @@ namespace ProjetoOficinaWeb.Migrations
                     b.Property<double>("Quantity")
                         .HasColumnType("float");
 
-                    b.Property<int?>("ServiceId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("VehicleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppointmentId");
-
-                    b.HasIndex("ServiceId");
 
                     b.HasIndex("VehicleId");
 
@@ -219,9 +221,6 @@ namespace ProjetoOficinaWeb.Migrations
                     b.Property<double>("Quantity")
                         .HasColumnType("float");
 
-                    b.Property<int?>("ServiceId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
@@ -229,8 +228,6 @@ namespace ProjetoOficinaWeb.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ServiceId");
 
                     b.HasIndex("UserId");
 
@@ -524,9 +521,15 @@ namespace ProjetoOficinaWeb.Migrations
 
             modelBuilder.Entity("ProjetoOficinaWeb.Data.Entities.Appointment", b =>
                 {
+                    b.HasOne("ProjetoOficinaWeb.Data.Entities.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId");
+
                     b.HasOne("ProjetoOficinaWeb.Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Service");
 
                     b.Navigation("User");
                 });
@@ -534,28 +537,18 @@ namespace ProjetoOficinaWeb.Migrations
             modelBuilder.Entity("ProjetoOficinaWeb.Data.Entities.AppointmentDetail", b =>
                 {
                     b.HasOne("ProjetoOficinaWeb.Data.Entities.Appointment", null)
-                        .WithMany("RepairEntries")
+                        .WithMany("Items")
                         .HasForeignKey("AppointmentId");
-
-                    b.HasOne("ProjetoOficinaWeb.Data.Entities.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId");
 
                     b.HasOne("ProjetoOficinaWeb.Data.Entities.Vehicle", "Vehicle")
                         .WithMany()
                         .HasForeignKey("VehicleId");
-
-                    b.Navigation("Service");
 
                     b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("ProjetoOficinaWeb.Data.Entities.AppointmentDetailTemp", b =>
                 {
-                    b.HasOne("ProjetoOficinaWeb.Data.Entities.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId");
-
                     b.HasOne("ProjetoOficinaWeb.Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
@@ -563,8 +556,6 @@ namespace ProjetoOficinaWeb.Migrations
                     b.HasOne("ProjetoOficinaWeb.Data.Entities.Vehicle", "Vehicle")
                         .WithMany()
                         .HasForeignKey("VehicleId");
-
-                    b.Navigation("Service");
 
                     b.Navigation("User");
 
@@ -609,7 +600,7 @@ namespace ProjetoOficinaWeb.Migrations
 
             modelBuilder.Entity("ProjetoOficinaWeb.Data.Entities.Appointment", b =>
                 {
-                    b.Navigation("RepairEntries");
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

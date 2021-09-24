@@ -19,6 +19,11 @@ namespace ProjetoOficinaWeb.Controllers
             return View();
         }
 
+        public IActionResult IndexDashboard()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

@@ -152,5 +152,10 @@ namespace ProjetoOficinaWeb.Controllers
         {
             return _context.Services.Any(e => e.Id == id);
         }
+
+        public IActionResult ServiceOffers()
+        {
+            return View();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using ProjetoOficinaWeb.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,11 +10,11 @@ namespace ProjetoOficinaWeb.Models
 {
     public class RegisterNewUserEmployeeViewModel : RegisterNewUserViewModel
     {
-        //[Display(Name = "Roles")]
-        //[Range(1, int.MaxValue, ErrorMessage = "Select a role.")] // na combobox o utilizador tem que selecionar um
-        //// O Range 1 serve para que aceite apenas a "segunda" opcao da combobox sendo a primeira o select a product
-        //public int VehicleId { get; set; }
+        [Display(Name = "Roles")]
+        [Range(1, int.MaxValue, ErrorMessage = "Select a role.")] // na combobox o utilizador tem que selecionar um
+        // O Range 1 serve para que aceite apenas a "segunda" opcao da combobox sendo a primeira o select a product
+        public int VehicleId { get; set; }
 
-        //public IEnumerable<SelectListItem> Roles { get; set; }  // a lista com os produtos todos
+        public IEnumerable<User> Roles { get; set; }  // a lista com os produtos todos
     }
 }

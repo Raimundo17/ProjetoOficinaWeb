@@ -124,5 +124,25 @@ namespace ProjetoOficinaWeb.Helpers
                 User = client.User
             };
         }
+
+        public Service ToService(ServiceViewModel model, string path, bool isNew)
+        {
+            return new Service
+            {
+                Id = model.Id,
+                Description = model.Description,
+                Price = model.Price,
+            };
+        }
+
+        public ServiceViewModel ToServiceViewModel(Service service)
+        {
+            return new ServiceViewModel
+            {
+                Id = service.Id,
+                Description = service.Description,
+                Price = service.Price,
+            };
+        }
     }
 }

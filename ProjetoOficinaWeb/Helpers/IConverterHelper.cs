@@ -20,5 +20,9 @@ namespace ProjetoOficinaWeb.Helpers
         Client ToClient(ClientViewModel model, string path, bool isNew); // o bool é para o id quando se for editar, se nao for novo coloca por aqui o id
 
         ClientViewModel ToClientViewModel(Client client);
+
+        Service ToService(ServiceViewModel model, string path, bool isNew); // o bool é para o id quando se for editar, se nao for novo coloca por aqui o id
+
+        ServiceViewModel ToServiceViewModel(Service service);
     }
 }

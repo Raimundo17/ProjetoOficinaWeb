@@ -22,15 +22,15 @@ namespace ProjetoOficinaWeb.Data.Entities
         [Required]
         public User User { get; set; } // Ligação de muitos para 1
 
-        public IEnumerable<AppointmentDetail> Items { get; set; } // faz a ligacao com a tabela OrderDetails (ligação de 1 para muitos)
-                                                                  // Uma lista de OrderDetails
+        public IEnumerable<AppointmentDetail> RepairEntries { get; set; } // faz a ligacao com a tabela AppointmentDetails (ligação de 1 para muitos)
+                                                                  // Uma lista de OrderDetails ; São as "linhas"
 
         [DisplayFormat(DataFormatString = "{0:N2}")]
-        public double Quantity => Items == null ? 0 : Items.Sum(i => i.Quantity); // Vai verificar se a lista é null (coloca 0) senão soma os valores todos
+        public double Quantity => RepairEntries == null ? 0 : RepairEntries.Sum(i => i.Quantity); // Vai verificar se a lista é null (coloca 0) senão soma os valores todos
 
 
         [DisplayFormat(DataFormatString = "{0:C2}")]
-        public decimal Value => Items == null ? 0 : Items.Sum(i => i.Value); // Vai verificar se a lista é null (coloca 0) senão soma os valores todos
+        public decimal Value => RepairEntries == null ? 0 : RepairEntries.Sum(i => i.Value);
 
     }
 }

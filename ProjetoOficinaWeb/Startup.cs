@@ -49,6 +49,7 @@ namespace ProjetoOficinaWeb
             services.AddScoped<IVehicleRepository, VehicleRepository>();
             services.AddScoped<IMechanicRepository, MechanicRepository>();
             services.AddScoped<IReceptionistRepository, ReceptionistRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddControllersWithViews();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
