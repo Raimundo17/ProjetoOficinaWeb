@@ -11,10 +11,7 @@ namespace ProjetoOficinaWeb.Data.Entities
 
         public Vehicle x { get; set; }
 
-        public Client c { get; set; }
-
         public Appointment a { get; set; }
 
-        public Mechanic m { get; set; }
     }
 }

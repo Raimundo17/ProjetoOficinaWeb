@@ -1,113 +1,99 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using ProjetoOficinaWeb.Data;
 using ProjetoOficinaWeb.Data.Entities;
 using ProjetoOficinaWeb.Helpers;
 using ProjetoOficinaWeb.Models;
+using System.Collections.Generic;
 
 namespace ProjetoOficinaWeb.Controllers
 {
     public class ReceptionistsController : Controller
     {
-        private readonly IReceptionistRepository _receptionistRepository;
+        private readonly UserManager<User> _userManager;
         private readonly IUserHelper _userHelper;
         private readonly IImageHelper _imageHelper;
         private readonly IConverterHelper _converterHelper;
 
-        public ReceptionistsController(IReceptionistRepository receptionistRepository, IUserHelper userHelper, IImageHelper imageHelper, IConverterHelper converterHelper)
+        public ReceptionistsController(UserManager<User> userManager, IUserHelper userHelper, IImageHelper imageHelper, IConverterHelper converterHelper)
         {
-            _receptionistRepository = receptionistRepository;
+            _userManager = userManager;
             _userHelper = userHelper;
             _imageHelper = imageHelper;
             _converterHelper = converterHelper;
         }
 
-        // GET: Mechanics
-        public IActionResult Index()
+        // GET: Receptionists
+        public async Task<IActionResult> Index()
         {
-            return View(_receptionistRepository.GetAll().OrderBy(p => p.FirstName)); // trás todos os veículos, ordenados pela marca
+            var users = await _userManager.GetUsersInRoleAsync("Receptionist");
+            var userRolesViewModel = new List<UserRolesViewModel>();
+            foreach (User user in users)
+            {
+                var model = new UserRolesViewModel();
+                model.Id = user.Id;
+                model.FirstName = user.FirstName;
+                model.LastName = user.LastName;
+                model.Address = user.Address;
+                model.PostalCode = user.PostalCode;
+                model.TaxNumber = user.TaxNumber;
+                model.PhoneNumber = user.PhoneNumber;
+                model.Email = user.Email;
+                userRolesViewModel.Add(model);
+            }
+            return View(userRolesViewModel);
         }
 
-        // GET: Mechanics/Details/5
-        public async Task<IActionResult> Details(int? id) // pode aceitar null
+        // GET: Receptionists/Details/5
+        [Authorize]
+        public async Task<IActionResult> Details(string id) // pode aceitar null
         {
             if (id == null)
             {
-                return new NotFoundViewResult("ProductNotFound"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
+                return new NotFoundViewResult("Error404");
             }
 
-            var receptionist = await _receptionistRepository.GetByIdAsync(id.Value); // tem que ser id.value para que se for null não "rebentar"
+            var recep = await _userHelper.GetUserByIdAsync(id);
 
-            if (receptionist == null)
+            if (recep == null)
             {
-                return new NotFoundViewResult("ProductNotFound");
+                return new NotFoundViewResult("Error404");
             }
 
-            return View(receptionist);
-        }
-
-        // GET: Mechanics/Create
-        [Authorize(Roles = "Admin")]
-        public IActionResult Create() // Abrir a view do create (aquela janela que aparece assim que carregamos no botao do create new)
-        {
-            return View();
-        }
-
-        // Este Post corresponde ao botão create que aparece em baixo quando acabamos de preencher a informacao do novo veículo
-        //Recebe o modelo e envia para a base de dados
-        // POST: Receptionist/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ReceptionistViewModel model) //Aqui já recebe o objeto
-        {
-            if (ModelState.IsValid)
+            var model = new RegisterNewUserMechanicViewModel();
+            if (recep != null)
             {
-                var path = string.Empty; // caminho da imagem
-
-                if (model.ImageFile != null && model.ImageFile.Length > 0) // verificar se tem imagem
-                {
-                    path = await _imageHelper.UploadImageAsync(model.ImageFile, "receptionists"); // guarda o ficheiro na pasta products
-                }
-
-                // coverte de product para view model
-                var receptionist = _converterHelper.ToReceptionist(model, path, true); // é true porque é novo (create)
-
-                //TODO : Modificar para o user que tiver logado
-                receptionist.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); // dá o utilizador que estiver "logado"
-                await _receptionistRepository.CreateAsync(receptionist); // recebe o veículo
-                return RedirectToAction(nameof(Index)); // redireciona para a action index (mostra a lista de veículos)
+                model.FirstName = recep.FirstName;
+                model.LastName = recep.LastName;
+                model.Address = recep.Address;
+                model.PhoneNumber = recep.PhoneNumber;
+                model.Username = recep.UserName;
+                model.PostalCode = recep.PostalCode;
+                model.TaxNumber = recep.TaxNumber;
+                model.Username = recep.UserName;
             }
-            return View(model); // se o veículo não passar nas validações mostra a view e deixa ficar lá o veículo,
-                                // para o utilizador não ter que preencher tudo de novo
+
+            return View(recep);
         }
 
         // GET: Receptionist/Edit/5
-        [Authorize]
-        public async Task<IActionResult> Edit(int? id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(string id)
         {
-            if (id == null) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
+            var recep = await _userHelper.GetUserByIdAsync(id);
+            var model = new ChangeUserViewModel();
+            if (recep != null)
             {
-                return new NotFoundViewResult("ProductNotFound"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
+                model.FirstName = recep.FirstName;
+                model.LastName = recep.LastName;
+                model.Address = recep.Address;
+                model.PostalCode = recep.PostalCode;
+                model.TaxNumber = recep.TaxNumber;
+                //model.PhoneNumber = mech.PhoneNumber;
             }
-
-            var receptionist = await _receptionistRepository.GetByIdAsync(id.Value); // coloca o id em memória e verifica caso o id tenha sido eliminado entretanto
-            if (receptionist == null)                            // tem que ser id.value para que se for null não "rebentar"
-            {
-                return new NotFoundViewResult("ProductNotFound");
-
-            }
-
-            var model = _converterHelper.ToReceptionistViewModel(receptionist); //vai á base de dados e converte de product para um product view model
-
-            return View(model); // retorna a view e manda o veículo lá para dentro
+            return View(model);
         }
 
         // POST: Receptionist/Edit/5
@@ -115,65 +101,70 @@ namespace ProjetoOficinaWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ReceptionistViewModel model)
+        public async Task<IActionResult> Edit(ChangeUserViewModel model)
         {
             if (ModelState.IsValid)
             {
-                try
+                var recep = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                if (recep != null)
                 {
-                    var path = model.ImageUrl;
+                    recep.FirstName = model.FirstName;
+                    recep.LastName = model.LastName;
+                    recep.Address = model.Address;
+                    recep.PostalCode = model.PostalCode;
+                    recep.TaxNumber = model.TaxNumber;
+                    //mech.PhoneNumber = model.PhoneNumber;
 
-                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    var response = await _userHelper.UpdateUserAsync(recep);
+
+                    if (response.Succeeded)
                     {
-                        path = await _imageHelper.UploadImageAsync(model.ImageFile, "receptionists");
-                    }
-
-                    var receptionist = _converterHelper.ToReceptionist(model, path, false); // o bool é false porque não é novo (edit)
-
-                    //TODO : Modificar para o user que tiver logado
-                    receptionist.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); // dá o utilizador que estiver "logado"
-                    await _receptionistRepository.UpdateAsync(receptionist); // faz o update do veículo
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await _receptionistRepository.ExistAsync(model.Id)) // verifica se o id existe devido a alguem entretanto ter apagado este veículo
-                    {
-                        return NotFound();
+                        ViewBag.UserMessage = "User updated!";
                     }
                     else
                     {
-                        throw;
+                        ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description);
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
             return View(model);
         }
 
         // GET: Receptionist/Delete/5 // Só mostra o que for para apagar. Não apaga
-        public async Task<IActionResult> Delete(int? id) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(string id) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
+        {
+            var recep = await _userHelper.GetUserByIdAsync(id);
+            var model = new ChangeUserViewModel();
+            if (recep != null)
+            {
+                model.FirstName = recep.FirstName;
+                model.LastName = recep.LastName;
+                model.Address = recep.Address;
+                model.PostalCode = recep.PostalCode;
+                model.TaxNumber = recep.TaxNumber;
+            }
+
+            return View(model);
+        }
+
+        // POST: Mechanics/Delete/5
+        [HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id) // o id é obrigatório
         {
             if (id == null)
             {
-                return new NotFoundViewResult("ProductNotFound"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
+                return NotFound();
             }
 
-            var receptionist = await _receptionistRepository.GetByIdAsync(id.Value);
-            if (receptionist == null)
+            var recep = await _userHelper.GetUserByIdAsync(id);
+            if (recep == null)
             {
-                return new NotFoundViewResult("ProductNotFound"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
+                return NotFound();
             }
 
-            return View(receptionist);
-        }
-
-        // POST: Receptionist/Delete/5
-        [HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id) // o id é obrigatório
-        {
-            var receptionist = await _receptionistRepository.GetByIdAsync(id); ; // o id é verficado para ver se ainda existe
-            await _receptionistRepository.DeleteAsync(receptionist); //remover em memória
+            await _userManager.DeleteAsync(recep);
             return RedirectToAction(nameof(Index));
         }
 

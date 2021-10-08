@@ -6,7 +6,7 @@ namespace ProjetoOficinaWeb.Models
 {
     public class VehicleViewModel : Vehicle
     {
-        [Display(Name = "Image")]
+        [Display(Name ="Image")]
         public IFormFile ImageFile { get; set; }
     }
 }

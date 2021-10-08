@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using ProjetoOficinaWeb.Data;
 using ProjetoOficinaWeb.Data.Entities;
 using ProjetoOficinaWeb.Helpers;
+using System.Text;
 
 namespace ProjetoOficinaWeb
 {
@@ -25,6 +27,8 @@ namespace ProjetoOficinaWeb
         {
             services.AddIdentity<User, IdentityRole>(cfg =>
             {
+                cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider; //video 33 token necessario para login
+                cfg.SignIn.RequireConfirmedEmail = true; //temos de ativar conta no email
                 cfg.User.RequireUniqueEmail = true;
                 cfg.Password.RequireDigit = false; // obrigatoriedade para as passwords terem varios caracters, numeros etc... COLOCAR A TRUE
                 cfg.Password.RequiredUniqueChars = 0;
@@ -33,8 +37,23 @@ namespace ProjetoOficinaWeb
                 cfg.Password.RequireNonAlphanumeric = false;
                 cfg.Password.RequiredLength = 6;
             })
-    .AddEntityFrameworkStores<DataContext>(); // separa o datacontext do "dele" do "meu"
-                                              //depois da pessoa fazer o login usa o DataContext "simples", o dele tem mais segurança
+                 .AddDefaultTokenProviders() //video 33
+                 .AddEntityFrameworkStores<DataContext>(); // separa o datacontext do "dele" do "meu"
+                                                           //depois da pessoa fazer o login usa o DataContext "simples", o dele tem mais segurança
+
+            //Token
+            services.AddAuthentication()//video 33 serviços para o token 
+                .AddCookie()
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = this.Configuration["Tokens:Issuer"],
+                        ValidAudience = this.Configuration["Tokens:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
+                    };
+                });
 
             services.AddDbContext<DataContext>(cfg => // cria um serviço do DataContext, injeto o meu
             {
@@ -45,12 +64,10 @@ namespace ProjetoOficinaWeb
                                              //AddTransient -> Usa e deita fora (deixa de ficar em memória) e não pode ser mais usado 
             services.AddScoped<IUserHelper, UserHelper>();
             services.AddScoped<IImageHelper, ImageHelper>();
+            services.AddScoped<IMailHelper, MailHelper>();
             services.AddScoped<IConverterHelper, ConverterHelper>();
             services.AddScoped<IVehicleRepository, VehicleRepository>();
-            services.AddScoped<IMechanicRepository, MechanicRepository>();
-            services.AddScoped<IReceptionistRepository, ReceptionistRepository>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
-            services.AddScoped<IClientRepository, ClientRepository>();
             services.AddControllersWithViews();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 

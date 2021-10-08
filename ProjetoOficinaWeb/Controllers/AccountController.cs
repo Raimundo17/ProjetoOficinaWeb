@@ -1,21 +1,34 @@
-﻿using System.Linq;
+﻿using ProjetoOficinaWeb.Data.Entities;
+using ProjetoOficinaWeb.Helpers;
+using ProjetoOficinaWeb.Models;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ProjetoOficinaWeb.Data.Entities;
-using ProjetoOficinaWeb.Helpers;
-using ProjetoOficinaWeb.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ProjetoOficinaWeb.Controllers
 {
     public class AccountController : Controller
     {
         private readonly IUserHelper _userHelper;
+        private readonly IImageHelper _imageHelper;
+        private readonly IMailHelper _mailHelper;
+        private readonly IConfiguration _configuration;
 
-        public AccountController(IUserHelper userHelper)
+        public AccountController(IUserHelper userHelper, IImageHelper imageHelper,IMailHelper mailHelper,IConfiguration configuration)
         {
             _userHelper = userHelper;
+            _imageHelper = imageHelper;
+            _mailHelper = mailHelper;
+            _configuration = configuration;
         }
+
 
         public IActionResult Login()
         {
@@ -72,6 +85,180 @@ namespace ProjetoOficinaWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterNewUserViewModel model)
         {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    var path = string.Empty;
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        path = await _imageHelper.UploadImageAsync(model.ImageFile, "Clients");
+                    }
+                    user = new User
+                    {
+                        Id = model.Id,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        Email = model.Email,
+                        UserName = model.Email,
+                        TaxNumber = model.TaxNumber,
+                        Address = model.Address,
+                        PhoneNumber = model.PhoneNumber,
+                        PostalCode = model.PostalCode,
+                        ImageUrl = path
+
+                    };
+
+                    var result = await _userHelper.AddUserAsync(user, model.Password);
+                    if (result != IdentityResult.Success)
+                    {
+                        ModelState.AddModelError(string.Empty, "The user couldn't be created.");
+                        return View(model);
+                    }
+                    await _userHelper.AddUserToRoleAsync(user, "customer");
+
+                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                    string tokenLink = Url.Action("ConfirmEmail", "User", new
+                    {
+                        userid = user.Id,
+                        token = myToken
+
+                    }, protocol: HttpContext.Request.Scheme);
+
+                    Response response = _mailHelper.SendEmail(model.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                        $"To allow the user, " +
+                        $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+
+                    if (response.IsSuccess)
+                    {
+                        ViewBag.Message = "The instructions to allow you user has been sent to email";
+                        return View(model);
+                    }
+
+                    ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
+
+                }
+            }
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                return NotFound();
+            }
+
+            var user = await _userHelper.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userHelper.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+
+            }
+
+            return View();
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
+        {
+            if (this.ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.UserName);
+                if (user != null)
+                {
+                    var result = await _userHelper.ValidatePasswordAsync(
+                        user,
+                        model.Password);
+
+                    if (result.Succeeded)
+                    {
+                        var claims = new[]
+                        {
+                            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        };
+
+                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
+                        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                        var token = new JwtSecurityToken(
+                            _configuration["Tokens:Issuer"],
+                            _configuration["Tokens:Audience"],
+                            claims,
+                            expires: DateTime.UtcNow.AddDays(15),
+                            signingCredentials: credentials);
+                        var results = new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                            expiration = token.ValidTo
+                        };
+
+                        return this.Created(string.Empty, results);
+
+                    }
+                }
+            }
+
+            return BadRequest();
+        }
+
+        //-----------------------------RECOVER PASSWORD W/TOKEN
+        public IActionResult RecoverPassword()
+        {
+            return View();
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+        //{
+        //    if (this.ModelState.IsValid)
+        //    {
+        //        var user = await _userHelper.GetUserByEmailAsync(model.Email);
+        //        if (user == null)
+        //        {
+        //            ModelState.AddModelError(string.Empty, "The email doesn't correspont to a registered user.");
+        //            return View(model);
+        //        }
+
+        //        var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+
+        //        var link = this.Url.Action(
+        //            "ResetPassword",
+        //            "User",
+        //            new { token = myToken }, protocol: HttpContext.Request.Scheme);
+
+        //        Response response = _mailHelper.SendEmail(model.Email, "Shop Password Reset", $"<h1>Shop Password Reset</h1>" +
+        //        $"To reset the password click in this link:</br></br>" +
+        //        $"<a href = \"{link}\">Reset Password</a>");
+
+        //        if (response.IsSuccess)
+        //        {
+        //            this.ViewBag.Message = "The instructions to recover your password has been sent to email.";
+        //        }
+
+        //        return this.View();
+
+        //    }
+
+        //    return this.View(model);
+        //}
+
+        public IActionResult RegisterMechanic()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterMechanic(RegisterNewUserMechanicViewModel model)
+        {
             if (ModelState.IsValid) // se os campos estao devidamente preenchidos
             {
                 var user = await _userHelper.GetUserByEmailAsync(model.Username); // verificar se este user já existe ou não
@@ -81,18 +268,22 @@ namespace ProjetoOficinaWeb.Controllers
                     {
                         FirstName = model.FirstName,
                         LastName = model.LastName,
+                        Address = model.Address,
                         Email = model.Username,
-                        UserName = model.Username
+                        TaxNumber = model.TaxNumber,
+                        PostalCode = model.PostalCode,
+                        UserName = model.Username,
+                        PhoneNumber = model.PhoneNumber.ToString()
                     };
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
 
-                    await _userHelper.AddUserToRoleAsync(user, "Customer");
+                    await _userHelper.AddUserToRoleAsync(user, "Mechanic");
 
-                    var isInRole = await _userHelper.IsUserInRoleAsync(user, "Customer");
+                    var isInRole = await _userHelper.IsUserInRoleAsync(user, "Mechanic"); 
                     if (!isInRole)
                     {
-                        await _userHelper.AddUserToRoleAsync(user, "Customer");
+                        await _userHelper.AddUserToRoleAsync(user, "Mechanic");
                     }
 
                     if (result != IdentityResult.Success)
@@ -120,13 +311,13 @@ namespace ProjetoOficinaWeb.Controllers
             return View(model);
         }
 
-        public IActionResult RegisterEmployee()
+        public IActionResult RegisterReceptionist()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterEmployee(RegisterNewUserEmployeeViewModel model)
+        public async Task<IActionResult> RegisterReceptionist(RegisterNewUserReceptionistViewModel model)
         {
             if (ModelState.IsValid) // se os campos estao devidamente preenchidos
             {
@@ -137,18 +328,22 @@ namespace ProjetoOficinaWeb.Controllers
                     {
                         FirstName = model.FirstName,
                         LastName = model.LastName,
+                        Address = model.Address,
                         Email = model.Username,
-                        UserName = model.Username
+                        TaxNumber = model.TaxNumber,
+                        PostalCode = model.PostalCode,
+                        UserName = model.Username,
+                        PhoneNumber = model.PhoneNumber.ToString()
                     };
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
 
-                    await _userHelper.AddUserToRoleAsync(user, "Receptionist"); // escolher pela dropdownlist
+                    await _userHelper.AddUserToRoleAsync(user, "Receptionist");
 
-                    var isInRole = await _userHelper.IsUserInRoleAsync(user, "Receptionist"); // escolher pela dropdownlist
+                    var isInRole = await _userHelper.IsUserInRoleAsync(user, "Receptionist");
                     if (!isInRole)
                     {
-                        await _userHelper.AddUserToRoleAsync(user, "Receptionist"); // escolher pela dropdownlist
+                        await _userHelper.AddUserToRoleAsync(user, "Receptionist");
                     }
 
                     if (result != IdentityResult.Success)
@@ -184,6 +379,9 @@ namespace ProjetoOficinaWeb.Controllers
             {
                 model.FirstName = user.FirstName;
                 model.LastName = user.LastName;
+                model.Address = user.Address;
+                model.PostalCode = user.PostalCode;
+                model.TaxNumber = user.TaxNumber;
             }
 
             return View(model);
@@ -199,6 +397,9 @@ namespace ProjetoOficinaWeb.Controllers
                 {
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName;
+                    user.Address = model.Address;
+                    user.PostalCode = model.PostalCode;
+                    user.TaxNumber = model.TaxNumber;
                     var response = await _userHelper.UpdateUserAsync(user);
                     if (response.Succeeded)
                     {

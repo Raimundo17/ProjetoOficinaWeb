@@ -51,6 +51,8 @@ namespace ProjetoOficinaWeb.Data
                 }
 
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);   //video 33
+                await _userHelper.ConfirmEmailAsync(user, token);  //video 33
             }
 
             var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
@@ -86,37 +88,6 @@ namespace ProjetoOficinaWeb.Data
                 AddService("Lighting", 25);
                 await _context.SaveChangesAsync(); // grava na base de dados
             }
-
-            if (!_context.Mechanics.Any()) // se nao existirem serviços
-            {
-                AddMechanic("Ronald","Reagen","Rua R",123456789,"ronaldregan@gmail.com",user);
-                AddMechanic("Jimmy", "Carter", "Rua J", 987654321, "jimmycarter@gmail.com", user);
-                AddMechanic("Gerald", "Ford", "Rua G", 135791357, "geraldford@gmail.com", user);
-                AddMechanic("Richard", "Nixon", "Rua R", 246802468, "richardnixon@gmail.com", user);
-                AddMechanic("Lyndon", "Johnson", "Rua L", 357903579, "lyndonjohnson@gmail.com", user);
-                AddMechanic("John", "Kennedy", "Rua J", 954739578, "johnkennedy@gmail.com", user);
-                await _context.SaveChangesAsync(); // grava na base de dados
-            }
-
-            if (!_context.Receptionists.Any()) // se nao existirem serviços
-            {
-                AddReceptionist("Madeleine", "Swann", "Rua M", 123456789, "madeleineswann@gmail.com", user);
-                AddReceptionist("Lucia", "Sciarra", "Rua L", 123456789, "luciasciarra@gmail.com", user);
-                AddReceptionist("Eve", "Moneypenny", "Rua E", 123456789, "evemoneypenny@gmail.com", user);
-                AddReceptionist("Camille", "Montes", "Rua C", 123456789, "camillemontes@gmail.com", user);
-                await _context.SaveChangesAsync(); // grava na base de dados
-            }
-
-            if (!_context.Clients.Any()) // se nao existirem serviços
-            {
-                AddClient("Bill", "Gates", "Rua B", 123456789, "billgates@gmail.com", user);
-                AddClient("Jeff", "Bezzos", "Rua J", 987654321, "jeffbezzos@gmail.com", user);
-                AddClient("Warren", "Buffett", "Rua W", 135791357, "warrenbuffett@gmail.com", user);
-                AddClient("Bernad", "Arnault", "Rua B", 246802468, "bernardarnault@gmail.com", user);
-                AddClient("Larry", "Ellison", "Rua L", 357903579, "larryellison@gmail.com", user);
-                AddClient("Carlos", "Slim", "Rua C", 954739578, "carlosslim@gmail.com", user);
-                await _context.SaveChangesAsync(); // grava na base de dados
-            }
         }
 
         private void AddVehicle(string licensePlate, string brand, string model, string color, User user)
@@ -138,45 +109,6 @@ namespace ProjetoOficinaWeb.Data
             {
                 Description = description,
                 Price = price,
-            });
-        }
-
-        private void AddMechanic(string firstName, string lastName, string adress, int phoneNumber, string email,User user)
-        {
-            _context.Mechanics.Add(new Mechanic
-            {
-                FirstName = firstName,
-                LastName = lastName,
-                Adress = adress,
-                PhoneNumber = phoneNumber,
-                Email = email,
-                User = user
-            });
-        }
-
-        private void AddReceptionist(string firstName, string lastName, string adress, int phoneNumber, string email, User user)
-        {
-            _context.Receptionists.Add(new Receptionist
-            {
-                FirstName = firstName,
-                LastName = lastName,
-                Adress = adress,
-                PhoneNumber = phoneNumber,
-                Email = email,
-                User = user
-            });
-        }
-
-        private void AddClient(string firstName, string lastName, string adress, int phoneNumber, string email, User user)
-        {
-            _context.Clients.Add(new Client
-            {
-                FirstName = firstName,
-                LastName = lastName,
-                Adress = adress,
-                PhoneNumber = phoneNumber,
-                Email = email,
-                User = user
             });
         }
     }
