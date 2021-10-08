@@ -261,7 +261,7 @@ namespace ProjetoOficinaWeb.Controllers
         {
             if (ModelState.IsValid) // se os campos estao devidamente preenchidos
             {
-                var user = await _userHelper.GetUserByEmailAsync(model.Username); // verificar se este user já existe ou não
+                var user = await _userHelper.GetUserByEmailAsync(model.Email); // verificar se este user já existe ou não
                 if (user == null)
                 {
                     user = new User
@@ -269,10 +269,10 @@ namespace ProjetoOficinaWeb.Controllers
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                         Address = model.Address,
-                        Email = model.Username,
+                        Email = model.Email,
                         TaxNumber = model.TaxNumber,
                         PostalCode = model.PostalCode,
-                        UserName = model.Username,
+                        UserName = model.Email,
                         PhoneNumber = model.PhoneNumber.ToString()
                     };
 
@@ -296,7 +296,7 @@ namespace ProjetoOficinaWeb.Controllers
                     {
                         Password = model.Password,
                         RememberMe = false,
-                        UserName = model.Username
+                        UserName = model.Email
                     };
 
                     var result2 = await _userHelper.LoginAsync(loginViewModel);

@@ -28,7 +28,7 @@ namespace ProjetoOficinaWeb.Data
                 return;
             }
 
-            var vehicle = await _context.vehicles.FindAsync(model.VehicleId);
+            var vehicle = await _context.Vehicles.FindAsync(model.VehicleId);
             if (vehicle == null)
             {
                 return;

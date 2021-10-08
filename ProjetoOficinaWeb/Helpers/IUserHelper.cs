@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using ProjetoOficinaWeb.Data.Entities;
 using ProjetoOficinaWeb.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ProjetoOficinaWeb.Helpers
 {
@@ -25,7 +22,7 @@ namespace ProjetoOficinaWeb.Helpers
 
         Task<bool> IsUserInRoleAsync(User user, string roleName); // verifica se o user já tem este role ou nao
 
-        
+
         Task<SignInResult> ValidatePasswordAsync(User user, string password);
 
 

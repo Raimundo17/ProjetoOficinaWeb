@@ -87,7 +87,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle smooth-scroll" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Accounts</a>
                             <div class="dropdown-menu dropdown-cust" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                                <a class="dropdown-item" asp-controller="Account" asp-action="Register">Register</a>
                                 @if (this.User.Identity.IsAuthenticated)
                                 {
                                     <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>

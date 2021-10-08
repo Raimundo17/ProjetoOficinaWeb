@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using ProjetoOficinaWeb.Data.Entities;
 using ProjetoOficinaWeb.Helpers;
 using ProjetoOficinaWeb.Models;
@@ -16,13 +17,17 @@ namespace ProjetoOficinaWeb.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IImageHelper _imageHelper;
         private readonly IConverterHelper _converterHelper;
+        private readonly IMailHelper _mailHelper;
+        private readonly IConfiguration _configuration;
 
-        public MechanicsController(UserManager<User> userManager, IUserHelper userHelper, IImageHelper imageHelper, IConverterHelper converterHelper)
+        public MechanicsController(UserManager<User> userManager, IUserHelper userHelper, IImageHelper imageHelper, IConverterHelper converterHelper, IMailHelper mailHelper, IConfiguration configuration)
         {
             _userManager = userManager;
             _userHelper = userHelper;
             _imageHelper = imageHelper;
             _converterHelper = converterHelper;
+            _mailHelper = mailHelper;
+            _configuration = configuration;
         }
 
         // GET: Mechanics
@@ -42,8 +47,14 @@ namespace ProjetoOficinaWeb.Controllers
                 model.PhoneNumber = user.PhoneNumber;
                 model.Email = user.Email;
                 userRolesViewModel.Add(model);
+                model.ImageUrl = user.ImageUrl;
             }
             return View(userRolesViewModel);
+        }
+
+        public IActionResult RegisterMechanic()
+        {
+            return View();
         }
 
         // GET: Mechanics/Details/5
@@ -68,10 +79,10 @@ namespace ProjetoOficinaWeb.Controllers
                 model.LastName = mech.LastName;
                 model.Address = mech.Address;
                 model.PhoneNumber = mech.PhoneNumber;
-                model.Username = mech.UserName;
+                model.Email = mech.UserName;
                 model.PostalCode = mech.PostalCode;
                 model.TaxNumber = mech.TaxNumber;
-                model.Username = mech.UserName;
+                model.Email = mech.UserName;
             }
 
             return View(mech);

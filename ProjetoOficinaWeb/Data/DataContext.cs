@@ -7,7 +7,7 @@ namespace ProjetoOficinaWeb.Data
     public class DataContext : IdentityDbContext<User> // Classe específica que fica responsável pela ligação á base de dados, injeto o meu user
     {
         
-        public DbSet<Vehicle> vehicles { get; set; } // criar a tabela
+        public DbSet<Vehicle> Vehicles { get; set; } // criar a tabela
                                                      //vehicles -> propriedade que fica ligada á tabela Vehicle através do DataContext
 
         public DbSet<Service> Services { get; set; }

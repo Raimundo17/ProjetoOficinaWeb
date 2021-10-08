@@ -53,6 +53,7 @@ namespace ProjetoOficinaWeb.Controllers
                 model.PhoneNumber = user.PhoneNumber;
                 model.Email = user.Email;
                 userRolesViewModel.Add(model);
+                model.ImageUrl = user.ImageUrl;
             }
             return View(userRolesViewModel);
         }
@@ -210,27 +211,29 @@ namespace ProjetoOficinaWeb.Controllers
                 model.LastName = customer.LastName;
                 model.Address = customer.Address;
                 model.PhoneNumber = customer.PhoneNumber;
-                model.Username = customer.UserName;
+                model.Email = customer.Email;
                 model.PostalCode = customer.PostalCode;
                 model.TaxNumber = customer.TaxNumber;
-                model.Username = customer.UserName;
             }
 
             return View(customer);
         }
 
         // GET: Clients/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(string? id)
         {
-            var customer = await _userHelper.GetUserByIdAsync(id);
-            var model = new ChangeUserViewModel();
-            if (customer != null)
+            var user = await _userHelper.GetUserByIdAsync(id.ToString());
+
+            var model = new RegisterNewUserViewModel();
+            if (user != null)
             {
-                model.FirstName = customer.FirstName;
-                model.LastName = customer.LastName;
-                model.Address = customer.Address;
-                model.PostalCode = customer.PostalCode;
-                model.TaxNumber = customer.TaxNumber;
+                model.FirstName = user.FirstName;
+                model.LastName = user.LastName;
+                model.Address = user.Address;
+                model.PhoneNumber = user.PhoneNumber;
+                model.TaxNumber = user.TaxNumber;
+                model.PostalCode = user.PostalCode;
+                model.ImageUrl = user.ImageUrl;
             }
 
             return View(model);
@@ -241,21 +244,33 @@ namespace ProjetoOficinaWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ChangeUserViewModel model)
+        public async Task<IActionResult> Edit(RegisterNewUserViewModel model, string id)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var customer = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-                if (customer != null)
+                var path = string.Empty;
+
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
                 {
-                    customer.FirstName = model.FirstName;
-                    customer.LastName = model.LastName;
-                    customer.Address = model.Address;
-                    customer.PostalCode = model.PostalCode;
-                    customer.TaxNumber = model.TaxNumber;
+                    path = await _imageHelper.UploadImageAsync(model.ImageFile, "Clients");
+                }
+                else
+                {
+                    path = model.ImageUrl;
+                }
 
-                    var response = await _userHelper.UpdateUserAsync(customer);
+                var user = await _userHelper.GetUserByIdAsync(id.ToString());
+                if (user != null)
+                {
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName;
+                    user.Address = model.Address;
+                    user.PhoneNumber = model.PhoneNumber;
+                    user.TaxNumber = model.TaxNumber;
+                    user.PostalCode = model.PostalCode;
+                    user.ImageUrl = path;
 
+                    var response = await _userHelper.UpdateUserAsync(user);
                     if (response.Succeeded)
                     {
                         ViewBag.UserMessage = "User updated!";
@@ -266,44 +281,46 @@ namespace ProjetoOficinaWeb.Controllers
                     }
                 }
             }
+
             return View(model);
         }
 
         // GET: Clients/Delete/5 // Só mostra o que for para apagar. Não apaga
-        public async Task<IActionResult> Delete(string id) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
-        {
-            var customer = await _userHelper.GetUserByIdAsync(id);
-            var model = new ChangeUserViewModel();
-            if (customer != null)
-            {
-                model.FirstName = customer.FirstName;
-                model.LastName = customer.LastName;
-                model.Address = customer.Address;
-                model.PostalCode = customer.PostalCode;
-                model.TaxNumber = customer.TaxNumber;
-            }
-
-            return View(model);
-        }
-
-        // POST: Clients/Delete/5
-        [HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id) // o id é obrigatório
+        public async Task<IActionResult> Delete(string? id) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var customer = await _userHelper.GetUserByIdAsync(id);
-            if (customer == null)
+            var client = await _userManager.FindByIdAsync(id);
+            if (client == null)
             {
                 return NotFound();
             }
 
-            await _userManager.DeleteAsync(customer);
+            await _userManager.DeleteAsync(client);
             return RedirectToAction(nameof(Index));
         }
+
+        //// POST: Clients/Delete/5
+        //[HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(string id) // o id é obrigatório
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var customer = await _userHelper.GetUserByIdAsync(id);
+        //    if (customer == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    await _userManager.DeleteAsync(customer);
+        //    return RedirectToAction(nameof(Index));
+        //}
     }
 }

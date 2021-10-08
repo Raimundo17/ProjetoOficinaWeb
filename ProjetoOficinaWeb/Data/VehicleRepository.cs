@@ -17,12 +17,12 @@ namespace ProjetoOficinaWeb.Data
 
         public IQueryable GetAllWithUsers()
         {
-            return _context.vehicles.Include(p => p.User); // como se fosse um join do SQL
+            return _context.Vehicles.Include(p => p.User); // como se fosse um join do SQL
         }
 
         public IEnumerable<SelectListItem> GetComboVehicles()
         {
-            var list = _context.vehicles.Select(p => new SelectListItem // como se fosse um foreach
+            var list = _context.Vehicles.Select(p => new SelectListItem // como se fosse um foreach
             {
                 Text = p.LicensePlate, // texto que vai aparecer na combobox
                 Value = p.Id.ToString()

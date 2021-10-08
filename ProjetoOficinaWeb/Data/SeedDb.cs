@@ -61,7 +61,7 @@ namespace ProjetoOficinaWeb.Data
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
             }
 
-            if (!_context.vehicles.Any()) // se nao existirem veículos
+            if (!_context.Vehicles.Any()) // se nao existirem veículos
             {
                 AddVehicle("22-GG-44", "Opel", "Astra", "White", user);
                 AddVehicle("07-DF-21", "Fiat", "500", "Red", user);
@@ -92,7 +92,7 @@ namespace ProjetoOficinaWeb.Data
 
         private void AddVehicle(string licensePlate, string brand, string model, string color, User user)
         {
-            _context.vehicles.Add(new Vehicle
+            _context.Vehicles.Add(new Vehicle
             {
                 LicensePlate = licensePlate,
                 Brand = brand,

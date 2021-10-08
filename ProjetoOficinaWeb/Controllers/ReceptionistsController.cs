@@ -69,10 +69,10 @@ namespace ProjetoOficinaWeb.Controllers
                 model.LastName = recep.LastName;
                 model.Address = recep.Address;
                 model.PhoneNumber = recep.PhoneNumber;
-                model.Username = recep.UserName;
+                model.Email = recep.UserName;
                 model.PostalCode = recep.PostalCode;
                 model.TaxNumber = recep.TaxNumber;
-                model.Username = recep.UserName;
+                model.Email = recep.UserName;
             }
 
             return View(recep);
