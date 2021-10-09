@@ -259,55 +259,62 @@ namespace ProjetoOficinaWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterMechanic(RegisterNewUserMechanicViewModel model)
         {
-            if (ModelState.IsValid) // se os campos estao devidamente preenchidos
+            if (ModelState.IsValid)
             {
-                var user = await _userHelper.GetUserByEmailAsync(model.Email); // verificar se este user já existe ou não
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
                 if (user == null)
                 {
+                    var path = string.Empty;
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        path = await _imageHelper.UploadImageAsync(model.ImageFile, "Mechanics");
+                    }
                     user = new User
                     {
+                        Id = model.Id,
                         FirstName = model.FirstName,
                         LastName = model.LastName,
-                        Address = model.Address,
                         Email = model.Email,
-                        TaxNumber = model.TaxNumber,
-                        PostalCode = model.PostalCode,
                         UserName = model.Email,
-                        PhoneNumber = model.PhoneNumber.ToString()
+                        TaxNumber = model.TaxNumber,
+                        Address = model.Address,
+                        PhoneNumber = model.PhoneNumber,
+                        PostalCode = model.PostalCode,
+                        ImageUrl = path
+
                     };
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
-
-                    await _userHelper.AddUserToRoleAsync(user, "Mechanic");
-
-                    var isInRole = await _userHelper.IsUserInRoleAsync(user, "Mechanic"); 
-                    if (!isInRole)
-                    {
-                        await _userHelper.AddUserToRoleAsync(user, "Mechanic");
-                    }
-
                     if (result != IdentityResult.Success)
                     {
-                        ModelState.AddModelError(string.Empty, "The user couldn´t be created");
+                        ModelState.AddModelError(string.Empty, "The user couldn't be created.");
+                        return View(model);
+                    }
+                    await _userHelper.AddUserToRoleAsync(user, "Mechanic");
+
+                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                    string tokenLink = Url.Action("ConfirmEmail", "User", new
+                    {
+                        userid = user.Id,
+                        token = myToken
+
+                    }, protocol: HttpContext.Request.Scheme);
+
+                    Response response = _mailHelper.SendEmail(model.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                        $"To allow the user, " +
+                        $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+
+                    if (response.IsSuccess)
+                    {
+                        ViewBag.Message = "The instructions to allow you user has been sent to email";
                         return View(model);
                     }
 
-                    var loginViewModel = new LoginViewModel // faz o login pelo utilizador
-                    {
-                        Password = model.Password,
-                        RememberMe = false,
-                        UserName = model.Email
-                    };
+                    ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
 
-                    var result2 = await _userHelper.LoginAsync(loginViewModel);
-                    if (result2.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-
-                    ModelState.AddModelError(string.Empty, "The user couldn´t be logged");
                 }
             }
+
             return View(model);
         }
 
@@ -319,55 +326,62 @@ namespace ProjetoOficinaWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterReceptionist(RegisterNewUserReceptionistViewModel model)
         {
-            if (ModelState.IsValid) // se os campos estao devidamente preenchidos
+            if (ModelState.IsValid)
             {
-                var user = await _userHelper.GetUserByEmailAsync(model.Username); // verificar se este user já existe ou não
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
                 if (user == null)
                 {
+                    var path = string.Empty;
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        path = await _imageHelper.UploadImageAsync(model.ImageFile, "Receptionists");
+                    }
                     user = new User
                     {
+                        Id = model.Id,
                         FirstName = model.FirstName,
                         LastName = model.LastName,
-                        Address = model.Address,
-                        Email = model.Username,
+                        Email = model.Email,
+                        UserName = model.Email,
                         TaxNumber = model.TaxNumber,
+                        Address = model.Address,
+                        PhoneNumber = model.PhoneNumber,
                         PostalCode = model.PostalCode,
-                        UserName = model.Username,
-                        PhoneNumber = model.PhoneNumber.ToString()
+                        ImageUrl = path
+
                     };
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
-
-                    await _userHelper.AddUserToRoleAsync(user, "Receptionist");
-
-                    var isInRole = await _userHelper.IsUserInRoleAsync(user, "Receptionist");
-                    if (!isInRole)
-                    {
-                        await _userHelper.AddUserToRoleAsync(user, "Receptionist");
-                    }
-
                     if (result != IdentityResult.Success)
                     {
-                        ModelState.AddModelError(string.Empty, "The user couldn´t be created");
+                        ModelState.AddModelError(string.Empty, "The user couldn't be created.");
+                        return View(model);
+                    }
+                    await _userHelper.AddUserToRoleAsync(user, "Receptionist");
+
+                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                    string tokenLink = Url.Action("ConfirmEmail", "User", new
+                    {
+                        userid = user.Id,
+                        token = myToken
+
+                    }, protocol: HttpContext.Request.Scheme);
+
+                    Response response = _mailHelper.SendEmail(model.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                        $"To allow the user, " +
+                        $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+
+                    if (response.IsSuccess)
+                    {
+                        ViewBag.Message = "The instructions to allow you user has been sent to email";
                         return View(model);
                     }
 
-                    var loginViewModel = new LoginViewModel // faz o login pelo utilizador
-                    {
-                        Password = model.Password,
-                        RememberMe = false,
-                        UserName = model.Username
-                    };
+                    ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
 
-                    var result2 = await _userHelper.LoginAsync(loginViewModel);
-                    if (result2.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-
-                    ModelState.AddModelError(string.Empty, "The user couldn´t be logged");
                 }
             }
+
             return View(model);
         }
 
@@ -381,6 +395,7 @@ namespace ProjetoOficinaWeb.Controllers
                 model.LastName = user.LastName;
                 model.Address = user.Address;
                 model.PostalCode = user.PostalCode;
+               // model.PhoneNumber = user.PhoneNumber.ToString();
                 model.TaxNumber = user.TaxNumber;
             }
 

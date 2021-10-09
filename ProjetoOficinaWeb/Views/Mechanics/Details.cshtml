@@ -3,7 +3,7 @@
 @{ ViewData["Title"] = "Details"; }
 
 <div class="content-wrapper">
-    <h1>Mechanics Details</h1>
+    <h1>Mechanic Details</h1>
     <div>
         <hr />
         <div class="row">
@@ -46,6 +46,12 @@
                         @Html.DisplayFor(model => model.TaxNumber)
                     </dd>
                 </dl>
+            </div>
+            <div class="col-md-4">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Url.Content(Model.ImageUrl)" alt="Image" style="width:300px;height:450px;max-width:100%;height:auto" />
+                }
             </div>
         </div>
     </div>

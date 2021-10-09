@@ -204,7 +204,7 @@ namespace ProjetoOficinaWeb.Controllers
                 return new NotFoundViewResult("Error404");
             }
 
-            var model = new RegisterNewUserMechanicViewModel();
+            var model = new RegisterNewUserViewModel();
             if (customer != null)
             {
                 model.FirstName = customer.FirstName;

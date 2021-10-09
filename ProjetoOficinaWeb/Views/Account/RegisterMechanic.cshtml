@@ -8,7 +8,7 @@
 
 <div class="row">
     <div class="col-md-4 offset-md-4">
-        <form method="post">
+        <form method="post" id="contactForm" name="contactForm" class="contactForm" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly"></div>
             <div class="form-group">
                 <label asp-for="FirstName">First Name</label>
@@ -21,7 +21,7 @@
                 <span asp-validation-for="LastName" class="text-warning"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Email">Username</label>
+                <label asp-for="Email">Email</label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-warning"></span>
             </div>
@@ -46,6 +46,11 @@
                 <span asp-validation-for="Address" class="text-warning"></span>
             </div>
             <div class="form-group">
+                <label asp-for="ImageFile" class="control-label"></label>
+                <input asp-for="ImageFile" class="form-control" type="file" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="Password">Password</label>
                 <input asp-for="Password" type="password" class="form-control" />
                 <span asp-validation-for="Password" class="text-warning"></span>
@@ -62,6 +67,6 @@
     </div>
 </div>
 
-@section Scripts {
+@*@section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+}*@
