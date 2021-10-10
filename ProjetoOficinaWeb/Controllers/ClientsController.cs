@@ -99,7 +99,7 @@ namespace ProjetoOficinaWeb.Controllers
                     await _userHelper.AddUserToRoleAsync(user, "Customer");
 
                     string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                    string tokenLink = Url.Action("ConfirmEmail", "User", new
+                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
                     {
                         userid = user.Id,
                         token = myToken,

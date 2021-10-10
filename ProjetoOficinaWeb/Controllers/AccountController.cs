@@ -33,41 +33,71 @@ namespace ProjetoOficinaWeb.Controllers
         public IActionResult Login()
         {
 
-            if (User.Identity.IsAuthenticated && this.User.IsInRole("Admin")) // se o utilizador quando fizer login já estiver autenticado
+            //if (User.Identity.IsAuthenticated && this.User.IsInRole("Admin")) // se o utilizador quando fizer login já estiver autenticado
+            //{
+            //    return this.RedirectToAction("IndexDashboard", "Home"); // DASHBOARD
+            //}
+
+            //if (User.Identity.IsAuthenticated) // se o utilizador quando fizer login já estiver autenticado
+            //{
+            //    return this.RedirectToAction("Index", "Home"); // primeiro a action depois o controlador home
+            //}
+
+            //return View(); // se acontecer alguma coisa de errado fica na mesma view
+
+            if (User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
             {
-                return this.RedirectToAction("IndexDashboard", "Home"); // DASHBOARD
+                return this.RedirectToAction("IndexDashboard", "Home");
+            }
+            else if (User.Identity.IsAuthenticated)
+            {
+                return this.RedirectToAction("Index", "Home");
             }
 
-            if (User.Identity.IsAuthenticated) // se o utilizador quando fizer login já estiver autenticado
-            {
-                return this.RedirectToAction("Index", "Home"); // primeiro a action depois o controlador home
-            }
-
-            return View(); // se acontecer alguma coisa de errado fica na mesma view
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid) // se estiver tudo preenchido(email, password requerido pelos data notations)
+            //if (ModelState.IsValid) // se estiver tudo preenchido(email, password requerido pelos data notations)
+            //{
+            //    var result = await _userHelper.LoginAsync(model);
+            //    if (result.Succeeded)
+            //    { // se na query(url) aparecer um ReturnUrl ele reencaminha o utilizador depois de fazer login para a página onde ia inicialmente
+            //        if (this.Request.Query.Keys.Contains("ReturnUrl"))
+            //        {
+            //            return Redirect(this.Request.Query["ReturnUrl"].First()); // o primeiro returnUrl que encontrar
+            //        }
+
+            //        if(User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
+            //        {
+            //            return this.RedirectToAction("IndexDashboard", "Home"); // DASHBOARD
+            //        }
+
+            //        return this.RedirectToAction("Index", "Home");
+            //    }
+            //}
+            //this.ModelState.AddModelError(string.Empty, "Failed to login");
+            //return View(model);
+
+            if (ModelState.IsValid)
             {
                 var result = await _userHelper.LoginAsync(model);
                 if (result.Succeeded)
-                { // se na query(url) aparecer um ReturnUrl ele reencaminha o utilizador depois de fazer login para a página onde ia inicialmente
+                {
+
                     if (this.Request.Query.Keys.Contains("ReturnUrl"))
                     {
-                        return Redirect(this.Request.Query["ReturnUrl"].First()); // o primeiro returnUrl que encontrar
+                        return Redirect(this.Request.Query["ReturnUrl"].First());
                     }
-
-                    if(User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
-                    {
-                        return this.RedirectToAction("IndexDashboard", "Home"); // DASHBOARD
-                    }
-
                     return this.RedirectToAction("Index", "Home");
+
+
                 }
             }
-            this.ModelState.AddModelError(string.Empty, "Failed to login");
+
+            this.ModelState.AddModelError(string.Empty, "Failed to login!");
             return View(model);
         }
 
@@ -119,7 +149,7 @@ namespace ProjetoOficinaWeb.Controllers
                     await _userHelper.AddUserToRoleAsync(user, "customer");
 
                     string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                    string tokenLink = Url.Action("ConfirmEmail", "User", new
+                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
                     {
                         userid = user.Id,
                         token = myToken
@@ -293,7 +323,7 @@ namespace ProjetoOficinaWeb.Controllers
                     await _userHelper.AddUserToRoleAsync(user, "Mechanic");
 
                     string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                    string tokenLink = Url.Action("ConfirmEmail", "User", new
+                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
                     {
                         userid = user.Id,
                         token = myToken
@@ -360,7 +390,7 @@ namespace ProjetoOficinaWeb.Controllers
                     await _userHelper.AddUserToRoleAsync(user, "Receptionist");
 
                     string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                    string tokenLink = Url.Action("ConfirmEmail", "User", new
+                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
                     {
                         userid = user.Id,
                         token = myToken
