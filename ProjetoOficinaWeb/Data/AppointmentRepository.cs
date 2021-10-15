@@ -20,7 +20,7 @@ namespace ProjetoOficinaWeb.Data
             _userHelper = userHelper;
         }
 
-        public async Task AddItemToOrderAsync(AddItemViewModel model, string userName)
+        public async Task AddItemToAppointmentAsync(AddItemViewModel model, string userName)
         {
             var user = await _userHelper.GetUserByEmailAsync(userName);
             if(user == null)
@@ -41,7 +41,7 @@ namespace ProjetoOficinaWeb.Data
             }
 
             var appointmentDetailTemp = await _context.AppointmentDetailsTemp
-                .Where(adt => adt.User == user && adt.Vehicle == vehicle && adt.Service == service)
+                .Where(apt => apt.User == user && apt.Vehicle == vehicle && apt.Service == service)
                 .FirstOrDefaultAsync();
 
             if(appointmentDetailTemp == null)
@@ -51,14 +51,62 @@ namespace ProjetoOficinaWeb.Data
                     Price = service.Price,
                     Vehicle = vehicle,
                     Service = service,
+                    Quantity = model.Quantity,
                     User = user,
                 };
 
                 _context.AppointmentDetailsTemp.Add(appointmentDetailTemp);
             }
+            else
+            {
+                appointmentDetailTemp.Quantity += model.Quantity;
+                _context.AppointmentDetailsTemp.Update(appointmentDetailTemp);
+            }
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> ConfirmAppointmentAsync(string userName)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(userName);
+            if (user == null)
+            {
+                return false;
+            }
+
+            var appointmentTmps = await _context.AppointmentDetailsTemp
+                .Include(o => o.Vehicle)
+                .Include(s => s.Service)
+                .Where(o => o.User == user)
+                .ToListAsync();
+
+            if (appointmentTmps == null || appointmentTmps.Count == 0)
+            {
+                return false;
+            }
+
+            var details = appointmentTmps.Select(o => new AppointmentDetail
+            {
+                Price = o.Price,
+                Vehicle = o.Vehicle,
+                Service = o.Service,
+                Quantity = o.Quantity
+            }).ToList();
+
+            var appointment = new Appointment
+            {
+                AppointmentDate = DateTime.UtcNow,
+                User = user,
+                Items = details
+            };
+
+            await CreateAsync(appointment);
+            _context.AppointmentDetailsTemp.RemoveRange(appointmentTmps);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
 
         public async Task DeleteDetailTempAsync(int id)
         {
@@ -72,27 +120,18 @@ namespace ProjetoOficinaWeb.Data
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IQueryable<Appointment>> GetAppointmentAsync(string userName)
+
+        public async Task RepairOrder(RepairViewModel model)
         {
-            var user = await _userHelper.GetUserByEmailAsync(userName);
-            if (user == null)
+            var appointment = await _context.Appointments.FindAsync(model.Id);
+            if (appointment == null)
             {
-                return null;
+                return;
             }
 
-            if (await _userHelper.IsUserInRoleAsync(user, "Admin")) // se for Admin vê todos as marcações
-            {
-                return _context.Appointments
-                    .Include(o => o.RepairEntries) // ir buscar dados entre tabelas ligadas diretamente (como se fosse um join)
-                    .ThenInclude(i => i.Vehicle) // ir buscar dados entre tabelas onde estejam ligadas por uma tabela a meio
-                    .OrderByDescending(o => o.RepairDate);
-            }
-
-            return _context.Appointments // cada utilizador vê só os seus orders
-                .Include(o => o.RepairEntries)
-                .ThenInclude(p => p.Vehicle)
-                .Where(o => o.User == user)
-                .OrderByDescending(o => o.RepairDate);
+            appointment.RepairDate = model.RepairDate;
+            _context.Appointments.Update(appointment);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<IQueryable<AppointmentDetailTemp>> GetDetailTempsAsync(string userName)
@@ -109,5 +148,54 @@ namespace ProjetoOficinaWeb.Data
                 .Where(o => o.User == user)
                 .OrderBy(o => o.Vehicle.LicensePlate);
         }
+
+
+        public async Task<IQueryable<Appointment>> GetAppointmentAsync(string userName)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(userName);
+            if (user == null)
+            {
+                return null;
+            }
+
+            if (await _userHelper.IsUserInRoleAsync(user, "Admin")) // se for Admin vê todos as marcações
+            {
+                return _context.Appointments
+                    .Include(o => o.User)
+                    .Include(o => o.Items)
+                    .ThenInclude(v => v.Vehicle) // ir buscar dados entre tabelas onde estejam ligadas por uma tabela a meio
+                    //.ThenInclude(s => s.Service)
+                    .OrderByDescending(o => o.AppointmentDate);
+            }
+
+            return _context.Appointments // cada utilizador vê só os seus orders
+                .Include(o => o.Items)
+                .ThenInclude(p => p.Vehicle)
+                //.ThenInclude(s => s.Service)
+                .Where(o => o.User == user)
+                .OrderByDescending(o => o.AppointmentDate);
+        }
+
+        public async Task<Appointment> GetAppointmentAsync(int id)
+        {
+            return await _context.Appointments.FindAsync(id);
+        }
+
+        public async Task ModifyAppointmentDetailTempQuantityAsync(int id, double quantity)
+        {
+            var appointmentDetailTemp = await _context.AppointmentDetailsTemp.FindAsync(id);
+            if (appointmentDetailTemp == null)
+            {
+                return;
+            }
+
+            appointmentDetailTemp.Quantity += quantity;
+            if (appointmentDetailTemp.Quantity > 0)
+            {
+                _context.AppointmentDetailsTemp.Update(appointmentDetailTemp);
+                await _context.SaveChangesAsync();
+            }
+        }
+
     }
 }

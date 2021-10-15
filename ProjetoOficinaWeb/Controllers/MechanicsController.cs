@@ -64,6 +64,7 @@ namespace ProjetoOficinaWeb.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> RegisterMechanic(RegisterNewUserMechanicViewModel model)
         {
             if (ModelState.IsValid)
@@ -218,6 +219,7 @@ namespace ProjetoOficinaWeb.Controllers
             return View(mechanic);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Mechanics/Edit/5
         public async Task<IActionResult> Edit(string? id)
         {
@@ -242,6 +244,8 @@ namespace ProjetoOficinaWeb.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(RegisterNewUserMechanicViewModel model, string id)
         {
@@ -284,6 +288,8 @@ namespace ProjetoOficinaWeb.Controllers
             return View(model);
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: Mechanics/Delete/5 // Só mostra o que for para apagar. Não apaga
         public async Task<IActionResult> Delete(string? id) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
         {

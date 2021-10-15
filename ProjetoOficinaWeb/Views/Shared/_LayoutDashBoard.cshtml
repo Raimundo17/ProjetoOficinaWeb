@@ -47,7 +47,7 @@ License URL: https://creativecommons.org/licenses/by/4.0/
             <div class="container-fluid ">
                 <div class="navbar-holder d-flex align-items-center justify-content-between">
                     <div class="navbar-header">
-                        <a  class="navbar-brand">
+                        <a class="navbar-brand">
                             <div class="brand-text brand-big hidden-lg-down"><img src="~/admin/img/logo-white.png" alt="Logo" class="img-fluid"></div>
                             <div class="brand-text brand-small"><img src="~/admin/img/logo-icon.png" alt="Logo" class="img-fluid"></div>
                         </a>
@@ -56,7 +56,7 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                             <span></span>
                             <span></span>
                         </a>
-                        @this.User.Identity.Name
+                        <a class="nav-link smooth-scroll" asp-area="" asp-controller="Account" asp-action="ChangeUser">@this.User.Identity.Name</a>
                     </div>
                 </div>
 
@@ -118,7 +118,7 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                             </li>
                             <li>
                                 <a rel="nofollow" href="#" class="dropdown-item d-flex">
-                                    <div class="msg-profile"> <img src="~/admin/img/avatar-2.jpg" alt="..." class="img-fluid rounded-circle"></div>
+                                    <div class="msg-profile"> <img src="~/images/Admin/avatar-2.jpg" alt="..." class="img-fluid rounded-circle"></div>
                                     <div class="msg-body">
                                         <h3 class="h5 msg-nav-h3">Frank Williams</h3><span>Sent You Message</span>
                                     </div>
@@ -126,7 +126,7 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                             </li>
                             <li>
                                 <a rel="nofollow" href="#" class="dropdown-item d-flex">
-                                    <div class="msg-profile"> <img src="~/admin/img/avatar-3.jpg" alt="..." class="img-fluid rounded-circle"></div>
+                                    <div class="msg-profile"> <img src="~/images/Admin/avatar-2.jpg" alt="..." class="img-fluid rounded-circle"></div>
                                     <div class="msg-body">
                                         <h3 class="h5 msg-nav-h3">Ashley Wood</h3><span>Sent You Message</span>
                                     </div>
@@ -136,39 +136,57 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a id="profile" class="nav-link logout" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="~/admin/img/avatar-1.jpg" alt="..." class="img-fluid rounded-circle" style="height: 30px; width: 30px;"></a>
+                        <a id="profile" class="nav-link logout" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="xxxxxxxx" alt="..." class="img-fluid rounded-circle" style="height: 30px; width: 30px;"></a>
                         <ul aria-labelledby="profile" class="dropdown-menu profile">
                             <li>
                                 <a rel="nofollow" href="#" class="dropdown-item d-flex">
-                                    <div class="msg-profile"> <img src="~/admin/img/avatar-1.jpg" alt="..." class="img-fluid rounded-circle"></div>
+                                    <div class="msg-profile"> <img src="xxxxxx" alt="..." class="img-fluid rounded-circle"></div>
                                     <div class="msg-body">
                                         <h3 class="h5">Steena Ben</h3><span>@this.User.Identity.Name</span>
                                     </div>
                                 </a>
                                 <hr>
                             </li>
-                            <li>
-                                <div class="notification">
-                                    <a class="notification-content" asp-area="" asp-controller="Account" asp-action="RegisterMechanic">Register new Mechanic</a>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="notification">
-                                    <a class="notification-content" asp-area="" asp-controller="Account" asp-action="RegisterReceptionist">Register new Receptionist</a>
-                                </div>
-                                <hr>
-                            </li>
-                            <li>
-                                <div class="notification">
-                                    <a class="notification-content" asp-area="" asp-controller="Vehicles" asp-action="Index">Vehicles</a>
-                                </div>
-                            </li>
+                            @if (this.User.IsInRole("Admin"))
+                            {
+                        <li>
+                            <div class="notification">
+                                <a class="notification-content" asp-area="" asp-controller="Account" asp-action="RegisterMechanic">Register new Mechanic</a>
+                            </div>
+                        </li>
+                                        <li>
+                                            <div class="notification">
+                                                <a class="notification-content" asp-area="" asp-controller="Account" asp-action="RegisterReceptionist">Register new Receptionist</a>
+                                            </div>
+                                            <hr>
+                                        </li>
+}
+                            @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
+                            {
+                        <li>
+                            <div class="notification">
+                                <a class="notification-content" asp-area="" asp-controller="Vehicles" asp-action="Index">Vehicles</a>
+                            </div>
+                        </li>
+                                        <li>
+                                            <div class="notification">
+                                                <a class="notification-content" asp-area="" asp-controller="Clients" asp-action="Index">Costumers</a>
+                                            </div>
+                                        </li>}
                             <li>
                                 <div class="notification">
                                     <a class="notification-content" asp-area="" asp-controller="Services" asp-action="Index">Services</a>
                                 </div>
                                 <hr>
                             </li>
+                            <li>
+                                @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
+                                {
+                            <div class="notification">
+                                <a class="notification-content" asp-area="" asp-controller="Appointments" asp-action="Index">Appointments</a>
+                            </div>
+                                }
+                                        </li>
                             <li>
                                 <div class="notification">
                                     <a class="notification-content" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
@@ -280,60 +298,68 @@ License URL: https://creativecommons.org/licenses/by/4.0/
         </nav>
     </header>
 
-        <!--<!--====================================================
+    <!--<!--====================================================
                             PAGE CONTENT
     ======================================================-->
 
-        <div class="page-content d-flex align-items-stretch">
+    <div class="page-content d-flex align-items-stretch">
 
-            <!--***** SIDE NAVBAR *****-->
-            <nav class="side-navbar">
-                <div class="sidebar-header d-flex align-items-center">
-                    <div class="avatar"><img src="img/avatar-1.jpg" alt="..." class="img-fluid rounded-circle"></div>
-                    <div class="title">
-                        <h1 class="h4">XXXXX
-                        </h1>
-                    </div>
+        <!--***** SIDE NAVBAR *****-->
+        <nav class="side-navbar">
+            <div class="sidebar-header d-flex align-items-center">
+                <div class="avatar"><img src="img/avatar-1.jpg" alt="..." class="img-fluid rounded-circle"></div>
+                <div class="title">
+                    <h1 class="h4">
+                        XXXXX
+                    </h1>
                 </div>
-                <hr>
-                <!-- Sidebar Navidation Menus-->
-                <ul class="list-unstyled">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index"><i class="icon-home"></i>Home</a>
-                    <li>
-                        <a href="#apps" aria-expanded="false" data-toggle="collapse"> <i class="icon-interface-windows"></i>Mechanics</a>
-                        <ul id="apps" class="collapse list-unstyled">
-                            <li><a class="notification-content" asp-area="" asp-controller="Account" asp-action="RegisterMechanic">Register new Mechanic</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Mechanics" asp-action="Index">Mechanics Management</a></li>
-                        </ul>
-                    </li>
-                    <li><a asp-area="" asp-controller="Services" asp-action="Index"><i class="fa fa-bar-chart"></i>Services</a></li>
-                    <li class="active">
-                        <a href="#forms" aria-expanded="false" data-toggle="collapse"> <i class="fa fa-building-o"></i>Receptionist</a>
-                        <ul id="forms" class="collapse list-unstyled">
-                            <li><a class="notification-content" asp-area="" asp-controller="Account" asp-action="RegisterReceptionist">Register new Receptionists</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Receptionists" asp-action="Index">Receptionists Management</a></li>
-                        </ul>
-                    </li>
-                    <li> <a class="notification-content" asp-area="" asp-controller="Vehicles" asp-action="Index"><i class="icon-interface-windows"></i>Vehicles </a></li>
-                    <li>
-                        <a href="#pages" aria-expanded="false" data-toggle="collapse"> <i class="fa fa-file-o"></i>Customer</a>
-                        <ul id="pages" class="collapse list-unstyled">
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Clients" asp-action="Index">Customer Management</a></li>
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register a new Customer</a></li>
-                        </ul>
-                    </li>
-                    <li> <a href="tables.html"> <i class="icon-grid"></i>Invoice </a></li>
-                    <li> <a href="tables.html"> <i class="icon-grid"></i>Repairs </a></li>
-                    <li>
-                        <a href="#elements" aria-expanded="false" data-toggle="collapse"> <i class="fa fa-globe"></i>Appointments </a>
-                        <ul id="elements" class="collapse list-unstyled">
-                            <li><a href="ui-buttons.html">Buttons</a></li>
-                            <li><a href="ui-cards.html">Cards</a></li>
-                            <li><a href="ui-progressbars.html">Progress Bar</a></li>
-                            <li><a href="ui-timeline.html">Timeline</a></li>
-                        </ul>
-                    </li>
-                </ul><span class="heading">Account</span>
+            </div>
+            <hr>
+            <!-- Sidebar Navidation Menus-->
+            <ul class="list-unstyled">
+                <li>
+                    <a asp-area="" asp-controller="Home" asp-action="Index"><i class="icon-home"></i>Home</a>
+                    @if (this.User.IsInRole("Admin"))
+                    {
+            <li>
+                <a href="#apps" aria-expanded="false" data-toggle="collapse"> <i class="icon-interface-windows"></i>Mechanics</a>
+                <ul id="apps" class="collapse list-unstyled">
+                    <li><a class="notification-content" asp-area="" asp-controller="Account" asp-action="RegisterMechanic">Register new Mechanic</a></li>
+                    <li><a class="nav-link text-dark" asp-area="" asp-controller="Mechanics" asp-action="Index">Mechanics Management</a></li>
+                </ul>
+            </li>
+                            @if (this.User.IsInRole("Admin"))
+                            {
+            <li><a asp-area="" asp-controller="Services" asp-action="Index"><i class="fa fa-bar-chart"></i>Services</a></li>}
+                                            <li class="active">
+                                                <a href="#forms" aria-expanded="false" data-toggle="collapse"> <i class="fa fa-building-o"></i>Receptionist</a>
+                                                <ul id="forms" class="collapse list-unstyled">
+                                                    <li><a class="notification-content" asp-area="" asp-controller="Account" asp-action="RegisterReceptionist">Register new Receptionists</a></li>
+                                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="Receptionists" asp-action="Index">Receptionists Management</a></li>
+                                                </ul>
+                                            </li>
+}
+                    @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
+                    {
+            <li> <a class="notification-content" asp-area="" asp-controller="Vehicles" asp-action="Index"><i class="icon-interface-windows"></i>Vehicles </a></li>
+                            <li>
+                                <a href="#pages" aria-expanded="false" data-toggle="collapse"> <i class="fa fa-file-o"></i>Customer</a>
+                                <ul id="pages" class="collapse list-unstyled">
+                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="Clients" asp-action="Index">Customer Management</a></li>
+                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register a new Customer</a></li>
+                                </ul>
+                            </li>
+}
+                    @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
+                    {
+            <li> <a href="tables.html"> <i class="icon-grid"></i>Invoice </a></li>
+                            <li> <a href="tables.html"> <i class="icon-grid"></i>Repairs </a></li>
+                    }
+                                            <li>
+                                                @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
+                                                {
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="Index"><i class="fa fa-globe"></i>Appointments</a></li>}
+                                            </ul><span class="heading">Account</span>
                 <ul class="list-unstyled">
                     <li> <a asp-controller="Account" asp-action="Logout"> <i class="icon-picture"></i>Logout </a></li>
                 </ul>
@@ -391,6 +417,6 @@ License URL: https://creativecommons.org/licenses/by/4.0/
         <!--Core Javascript -->
         <script src="~/admin/js/mychart.js"></script>
         @await RenderSectionAsync("Scripts", required: false)
-</body>
+    </body>
 
 </html>

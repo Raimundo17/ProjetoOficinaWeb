@@ -14,15 +14,18 @@
         <tr>
             @if (this.User.IsInRole("Admin"))
             {
-                <th>
-                    @Html.DisplayNameFor(model => model.User.FullName)
-                </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User.FullName)
+            </th>
             }
             <th>
-                @Html.DisplayNameFor(model => model.AppointmentDate)
+                @Html.DisplayNameFor(model => model.AppointmentDateLocal)
             </th>
             <th>
-                # Lines
+                @Html.DisplayNameFor(model => model.RepairDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lines)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Quantity)
@@ -30,38 +33,37 @@
             <th>
                 @Html.DisplayNameFor(model => model.Value)
             </th>
+            <th></th>
         </tr>
     </thead>
-</table>
-<tbody>
-    @foreach(var item in Model)
-            {
-    <tr>
-        @if (this.User.IsInRole("Admin"))
+    <tbody>
+        @foreach (var item in Model)
         {
-            <th>
-                @Html.DisplayNameFor(modelItem => item.User.FullName)
-            </th>
-        }
-        <td>
-            @Html.DisplayFor(modelItem => item.AppointmentDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.RepairDate)
-        </td>
-        <td>
-            # Lines
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Quantity)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Value)
-        </td>
-        <td>
-            <a asp-action="Book" asp-route-id="@item.Id" class="btn btn-info" id="btnDeliver">Book</a>
-            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" id="btnDelete">Delete</a>
-        </td>
-    </tr>
-     }
-</tbody>
+<tr>
+    @if (this.User.IsInRole("Admin"))
+    {
+<th>
+    @Html.DisplayFor(modelItem => item.User.FullName)
+</th>}
+    <td>
+        @Html.DisplayFor(modelItem => item.AppointmentDateLocal)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.RepairDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Lines)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Quantity)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Value)
+    </td>
+    <td>
+        <a asp-action="Repair" asp-route-id="@item.Id" class="btn btn-info" id="btnDeliver">Repair</a>
+        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" id="btnDelete">Delete</a>
+    </td>
+</tr>}
+    </tbody>
+</table>

@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjetoOficinaWeb.Data.Entities;
 using ProjetoOficinaWeb.Models;
 
@@ -44,24 +46,6 @@ namespace ProjetoOficinaWeb.Helpers
 
         Task<User> GetUserAsync(string id);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        IEnumerable<SelectListItem> GetComboUsers();
     }
 }

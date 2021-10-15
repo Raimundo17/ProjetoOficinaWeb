@@ -39,7 +39,8 @@ namespace ProjetoOficinaWeb.Data
                     LastName = "Raimundo",
                     Email = "daniel.raimundo.21229@formandos.cinel.pt",
                     UserName = "daniel.raimundo.21229@formandos.cinel.pt",
-                    PhoneNumber = "123456789"
+                    PhoneNumber = "123456789",
+                    ImageUrl = "~/wwwroot/images/Admin/avatar-2.jpg"
                 };
 
                 var result = await _userHelper.AddUserAsync(user, "123456");
@@ -61,16 +62,16 @@ namespace ProjetoOficinaWeb.Data
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
             }
 
-            if (!_context.Vehicles.Any()) // se nao existirem veículos
-            {
-                AddVehicle("22-GG-44", "Opel", "Astra", "White", user);
-                AddVehicle("07-DF-21", "Fiat", "500", "Red", user);
-                AddVehicle("89-XX-37", "Toyota", "Yaris", "Grey", user);
-                AddVehicle("15-PR-12", "Renault", "Clio", "Blue", user);
-                AddVehicle("57-QP-56", "Ford", "Focus", "White", user);
-                AddVehicle("06-TB-44", "Volkswagen", "Golf", "Yellow", user);
-                await _context.SaveChangesAsync(); // grava na base de dados
-            }
+            //if (!_context.Vehicles.Any()) // se nao existirem veículos
+            //{
+            //    AddVehicle("22-GG-44", "Opel", "Astra", "White", user);
+            //    AddVehicle("07-DF-21", "Fiat", "500", "Red", user);
+            //    AddVehicle("89-XX-37", "Toyota", "Yaris", "Grey", user);
+            //    AddVehicle("15-PR-12", "Renault", "Clio", "Blue", user);
+            //    AddVehicle("57-QP-56", "Ford", "Focus", "White", user);
+            //    AddVehicle("06-TB-44", "Volkswagen", "Golf", "Yellow", user);
+            //    await _context.SaveChangesAsync(); // grava na base de dados
+            //}
 
             if (!_context.Services.Any()) // se nao existirem serviços
             {
@@ -90,18 +91,18 @@ namespace ProjetoOficinaWeb.Data
             }
         }
 
-        private void AddVehicle(string licensePlate, string brand, string model, string color, User user)
-        {
-            _context.Vehicles.Add(new Vehicle
-            {
-                LicensePlate = licensePlate,
-                Brand = brand,
-                Model = model,
-                Color = color,
-                Year = _random.Next(1995, 2020),
-                User = user
-            });
-        }
+        //private void AddVehicle(string licensePlate, string brand, string model, string color, User user)
+        //{
+        //    _context.Vehicles.Add(new Vehicle
+        //    {
+        //        LicensePlate = licensePlate,
+        //        Brand = brand,
+        //        Model = model,
+        //        Color = color,
+        //        Year = _random.Next(1995, 2020),
+        //        User = user
+        //    });
+        //}
 
         private void AddService(string description, int price)
         {

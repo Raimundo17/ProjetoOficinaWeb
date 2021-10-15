@@ -10,8 +10,6 @@ namespace ProjetoOficinaWeb.Data.Entities
         [Display(Name = "License Plate")]
         public string LicensePlate { get; set; }
 
-        //public Client Name Id { get; set; }
-
         public string Brand { get; set; }
 
         public string Model { get; set; }

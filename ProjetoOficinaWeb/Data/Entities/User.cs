@@ -22,7 +22,7 @@ namespace ProjetoOficinaWeb.Data.Entities
         public string PostalCode { get; set; }
 
         [Display(Name = "Full Name")]
-        public string FullName => $"{FirstName}{LastName}";
+        public string FullName => $"{FirstName} {LastName}";
 
         public string ImageUrl { get; set; } // Link das imagens
 

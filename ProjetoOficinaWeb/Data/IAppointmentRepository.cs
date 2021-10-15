@@ -12,8 +12,16 @@ namespace ProjetoOficinaWeb.Data
 
         Task<IQueryable<AppointmentDetailTemp>> GetDetailTempsAsync(string userName); // Dou lhe um user e ele dá o temporário desse user
 
-        Task AddItemToOrderAsync(AddItemViewModel model, string userName);
+        Task AddItemToAppointmentAsync(AddItemViewModel model, string userName);
+
+        Task ModifyAppointmentDetailTempQuantityAsync(int id, double quantity);
 
         Task DeleteDetailTempAsync(int id);
+
+        Task<bool> ConfirmAppointmentAsync(string userName);
+
+        Task RepairOrder(RepairViewModel model);
+
+        Task<Appointment> GetAppointmentAsync(int id);
     }
 }

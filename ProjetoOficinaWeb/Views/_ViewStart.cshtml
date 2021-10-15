@@ -1,4 +1,4 @@
-﻿@if (this.User.IsInRole("Admin"))
+﻿@if (this.User.IsInRole("Admin") || this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
 {
     {
         Layout = "_LayoutDashBoard";

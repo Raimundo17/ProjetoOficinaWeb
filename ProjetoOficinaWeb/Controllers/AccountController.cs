@@ -32,19 +32,6 @@ namespace ProjetoOficinaWeb.Controllers
 
         public IActionResult Login()
         {
-
-            //if (User.Identity.IsAuthenticated && this.User.IsInRole("Admin")) // se o utilizador quando fizer login já estiver autenticado
-            //{
-            //    return this.RedirectToAction("IndexDashboard", "Home"); // DASHBOARD
-            //}
-
-            //if (User.Identity.IsAuthenticated) // se o utilizador quando fizer login já estiver autenticado
-            //{
-            //    return this.RedirectToAction("Index", "Home"); // primeiro a action depois o controlador home
-            //}
-
-            //return View(); // se acontecer alguma coisa de errado fica na mesma view
-
             if (User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
             {
                 return this.RedirectToAction("IndexDashboard", "Home");
@@ -53,50 +40,24 @@ namespace ProjetoOficinaWeb.Controllers
             {
                 return this.RedirectToAction("Index", "Home");
             }
-
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            //if (ModelState.IsValid) // se estiver tudo preenchido(email, password requerido pelos data notations)
-            //{
-            //    var result = await _userHelper.LoginAsync(model);
-            //    if (result.Succeeded)
-            //    { // se na query(url) aparecer um ReturnUrl ele reencaminha o utilizador depois de fazer login para a página onde ia inicialmente
-            //        if (this.Request.Query.Keys.Contains("ReturnUrl"))
-            //        {
-            //            return Redirect(this.Request.Query["ReturnUrl"].First()); // o primeiro returnUrl que encontrar
-            //        }
-
-            //        if(User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
-            //        {
-            //            return this.RedirectToAction("IndexDashboard", "Home"); // DASHBOARD
-            //        }
-
-            //        return this.RedirectToAction("Index", "Home");
-            //    }
-            //}
-            //this.ModelState.AddModelError(string.Empty, "Failed to login");
-            //return View(model);
-
             if (ModelState.IsValid)
             {
                 var result = await _userHelper.LoginAsync(model);
                 if (result.Succeeded)
                 {
-
                     if (this.Request.Query.Keys.Contains("ReturnUrl"))
                     {
                         return Redirect(this.Request.Query["ReturnUrl"].First());
                     }
                     return this.RedirectToAction("Index", "Home");
-
-
                 }
             }
-
             this.ModelState.AddModelError(string.Empty, "Failed to login!");
             return View(model);
         }
@@ -170,7 +131,6 @@ namespace ProjetoOficinaWeb.Controllers
 
                 }
             }
-
             return View(model);
         }
 

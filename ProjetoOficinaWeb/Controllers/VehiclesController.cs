@@ -25,10 +25,14 @@ namespace ProjetoOficinaWeb.Controllers
         }
 
         // GET: Vehicles
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_vehicleRepository.GetAll().OrderBy(p => p.Brand)); // trás todos os veículos, ordenados pela marca
-        }                                                                   // no futuro ordenar pelo nome do cliente
+            /*  return View(_vehicleRepository.GetAll().OrderBy(p => p.Brand));*/ // trás todos os veículos, ordenados pela marca
+
+            var model = await _vehicleRepository.GetVehicleAsync(this.User.Identity.Name); // Cada utilizador só vê o seu veículo
+            return View(model);
+        }                                                                  
+
 
         // GET: Vehicles/Details/5
         public async Task<IActionResult> Details(int? id) // pode aceitar null
@@ -48,20 +52,27 @@ namespace ProjetoOficinaWeb.Controllers
             return View(vehicle);
         }
 
+        [Authorize(Roles = "Receptionist, Mechanic")]
         // GET: Vehicles/Create
-        [Authorize(Roles = "Admin")]
         public IActionResult Create() // Abrir a view do create (aquela janela que aparece assim que carregamos no botao do create new)
         {
             return View();
+
+            //var model = new VehicleViewModel
+            //{
+            //    Users = _vehicleRepository.GetComboUser()
+            //};
+
+            //return View(model);
         }
 
-        // Este Post corresponde ao botão create que aparece em baixo quando acabamos de preencher a informacao do novo veículo
-        //Recebe o modelo e envia para a base de dados
+        // Este Post corresponde ao botão create que aparece em baixo quando acabamos de preencher a informacao do novo veículo, Recebe o modelo e envia para a base de dados
         // POST: Vehicles/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Receptionist, Mechanic")]
         public async Task<IActionResult> Create(VehicleViewModel modell) //Aqui já recebe o objeto
         {
             if (ModelState.IsValid)
@@ -83,10 +94,19 @@ namespace ProjetoOficinaWeb.Controllers
             }
             return View(modell); // se o veículo não passar nas validações mostra a view e deixa ficar lá o veículo,
                                  // para o utilizador não ter que preencher tudo de novo
+
+            //if(ModelState.IsValid)
+            //{
+            //    var vehicle = _converterHelper.ToVehicle(modell, true);
+            //    vehicle.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+            //    await _vehicleRepository.CreateAsync(vehicle);
+            //    return RedirectToAction(nameof(Index));
+            //}
+
+            //return View(modell);
         }
 
         // GET: Vehicles/Edit/5
-        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
@@ -149,7 +169,8 @@ namespace ProjetoOficinaWeb.Controllers
         }
 
         // GET: Vehicles/Delete/5 // Só mostra o que for para apagar. Não apaga
-        [Authorize]
+        [Authorize(Roles = "Receptionist")]
+        [Authorize(Roles = "Mechanic")]
         public async Task<IActionResult> Delete(int? id) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
         {
             if (id == null)
@@ -167,6 +188,8 @@ namespace ProjetoOficinaWeb.Controllers
         }
 
         // POST: Vehicles/Delete/5
+        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Mechanic")]
         [HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id) // o id é obrigatório

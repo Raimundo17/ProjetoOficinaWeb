@@ -1,23 +1,52 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjetoOficinaWeb.Data.Entities;
+using ProjetoOficinaWeb.Helpers;
 
 namespace ProjetoOficinaWeb.Data
 {
     public class VehicleRepository : GenericRepository<Vehicle>, IVehicleRepository
     {
         private readonly DataContext _context;
+        private readonly IUserHelper _userHelper;
 
-        public VehicleRepository(DataContext context) : base(context)
+        public VehicleRepository(DataContext context, IUserHelper userHelper) : base(context)
         {
             _context = context;
+            _userHelper = userHelper;
         }
 
         public IQueryable GetAllWithUsers()
         {
             return _context.Vehicles.Include(p => p.User); // como se fosse um join do SQL
+        }
+
+        public async Task<IQueryable<Vehicle>> GetVehicleAsync(string userName)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(userName);
+            if (user == null)
+            {
+                return null;
+            }
+
+            if (await _userHelper.IsUserInRoleAsync(user, "Admin")) // se for Admin vê todos os veículos
+            {
+                return _context.Vehicles
+                .Include(o => o.User); // ir buscar dados entre tabelas ligadas diretamente (como se fosse um join)
+                //.Include(o => o.LicensePlate); // ir buscar dados entre tabelas ligadas diretamente (como se fosse um join)
+            }
+
+            return _context.Vehicles // cada utilizador vê só os seus veículos
+              //  .Include(o => o.LicensePlate)
+                .Where(o => o.User == user);
+        }
+
+        public async Task<Vehicle> GetVehicleAsync(int id)
+        {
+            return await _context.Vehicles.FindAsync(id);
         }
 
         public IEnumerable<SelectListItem> GetComboVehicles()
