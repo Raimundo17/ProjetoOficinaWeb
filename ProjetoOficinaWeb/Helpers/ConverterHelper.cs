@@ -16,8 +16,7 @@ namespace ProjetoOficinaWeb.Helpers
                 Model = model.Model,
                 Color = model.Color,
                 Year = model.Year,
-                UserId = model.UserId.ToString()
-                
+                UserId = model.UserId.ToString()             
             };
         }
 

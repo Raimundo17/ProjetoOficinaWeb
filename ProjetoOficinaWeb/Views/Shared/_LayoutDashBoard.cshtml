@@ -332,15 +332,15 @@ License URL: https://creativecommons.org/licenses/by/4.0/
             </li>
                             @if (this.User.IsInRole("Admin"))
                             {
-            <li><a asp-area="" asp-controller="Services" asp-action="Index"><i class="fa fa-bar-chart"></i>Services</a></li>}
+            <li><a asp-area="" asp-controller="Services" asp-action="Index"><i class="fa fa-bar-chart"></i>Services</a></li>
+}
                                             <li class="active">
                                                 <a href="#forms" aria-expanded="false" data-toggle="collapse"> <i class="fa fa-building-o"></i>Receptionist</a>
                                                 <ul id="forms" class="collapse list-unstyled">
                                                     <li><a class="notification-content" asp-area="" asp-controller="Account" asp-action="RegisterReceptionist">Register new Receptionists</a></li>
                                                     <li><a class="nav-link text-dark" asp-area="" asp-controller="Receptionists" asp-action="Index">Receptionists Management</a></li>
                                                 </ul>
-                                            </li>
-}
+                                            </li>}
                     @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
                     {
             <li> <a class="notification-content" asp-area="" asp-controller="Vehicles" asp-action="Index"><i class="icon-interface-windows"></i>Vehicles </a></li>
@@ -350,18 +350,18 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                                     <li><a class="nav-link text-dark" asp-area="" asp-controller="Clients" asp-action="Index">Customer Management</a></li>
                                     <li><a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register a new Customer</a></li>
                                 </ul>
-                            </li>
-}
+                            </li>}
                     @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
                     {
-            <li> <a href="tables.html"> <i class="icon-grid"></i>Invoice </a></li>
-                            <li> <a href="tables.html"> <i class="icon-grid"></i>Repairs </a></li>
-                            <li>  <a class="notification-content" asp-area="" asp-controller="Repairs" asp-action="Index">Repairs</a></li>}
-                                            <li>
-                                                @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
-                                                {
-                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="Index"><i class="fa fa-globe"></i>Appointments</a></li>}
-                                            </ul><span class="heading">Account</span>
+            <li> <a href="tables.html"> <i class="icon-grid"></i>Invoice </a></li> @*<li> <a href="tables.html"> <i class="icon-grid"></i>Repairs </a></li>*@
+                            @*<li> <a class="notification-content" asp-area="" asp-controller="Repairs" asp-action="Index"><i class="icon-grid"></i>Repairs</a></li>*@
+                            <li> <a class="notification-content"><i class="icon-grid"></i>Repairs</a></li>}
+                    <li>
+                        @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
+                        {
+            <li><a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="Index"><i class="fa fa-globe"></i>Appointments</a></li>
+}
+                    </ul><span class="heading">Account</span>
                 <ul class="list-unstyled">
                     <li> <a asp-controller="Account" asp-action="Logout"> <i class="icon-picture"></i>Logout </a></li>
                 </ul>

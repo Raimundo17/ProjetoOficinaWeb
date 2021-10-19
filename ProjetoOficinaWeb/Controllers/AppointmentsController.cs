@@ -24,7 +24,8 @@ namespace ProjetoOficinaWeb.Controllers
         // GET: Appointments 
         public async Task<IActionResult> Index()
         {
-            var model = await _appointmentRepository.GetAppointmentAsync(this.User.Identity.Name);
+            //var model = await _appointmentRepository.GetAppointmentAsync(this.User.Identity.Name);
+            var model =  _appointmentRepository.GetAll();
             return View(model);
         }
 

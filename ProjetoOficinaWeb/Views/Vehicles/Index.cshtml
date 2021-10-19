@@ -10,7 +10,7 @@
 <table class="table">
     <thead>
         <tr>
-            @if (this.User.IsInRole("Receptionist"))
+            @if (this.User.IsInRole("Mechanic"))
             {
             <th>
                 @Html.DisplayNameFor(model => model.UserId)
@@ -42,7 +42,7 @@
                 @foreach (var item in Model) 
                 {
                  <tr>
-            @if (this.User.IsInRole("Receptionist"))
+            @if (this.User.IsInRole("Mechanic"))
             {
                      <th>
                          @Html.DisplayFor(modelItem => item.UserId)
