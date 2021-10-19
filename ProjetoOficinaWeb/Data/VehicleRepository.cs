@@ -21,7 +21,7 @@ namespace ProjetoOficinaWeb.Data
 
         public IQueryable GetAllWithUsers()
         {
-            return _context.Vehicles.Include(p => p.User); // como se fosse um join do SQL
+            return _context.Vehicles.Include(p => p.UserId); // como se fosse um join do SQL
         }
 
         public async Task<IQueryable<Vehicle>> GetVehicleAsync(string userName)
@@ -32,16 +32,18 @@ namespace ProjetoOficinaWeb.Data
                 return null;
             }
 
-            if (await _userHelper.IsUserInRoleAsync(user, "Admin")) // se for Admin vê todos os veículos
+            if (await _userHelper.IsUserInRoleAsync(user, "Receptionist")) // se for Admin vê todos os veículos
             {
                 return _context.Vehicles
-                .Include(o => o.User); // ir buscar dados entre tabelas ligadas diretamente (como se fosse um join)
-                //.Include(o => o.LicensePlate); // ir buscar dados entre tabelas ligadas diretamente (como se fosse um join)
+                .Include(o => o.UserId) // ir buscar dados entre tabelas ligadas diretamente (como se fosse um join)
+                //.Include(o => o.User.Email)
+                .Include(o => o.LicensePlate); // ir buscar dados entre tabelas ligadas diretamente (como se fosse um join)
             }
 
             return _context.Vehicles // cada utilizador vê só os seus veículos
-              //  .Include(o => o.LicensePlate)
-                .Where(o => o.User == user);
+                .Include(o => o.LicensePlate);
+                //.Include(o => o.User.Email);
+                //.Where(o => o.UserId == user);
         }
 
         public async Task<Vehicle> GetVehicleAsync(int id)

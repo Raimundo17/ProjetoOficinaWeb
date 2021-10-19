@@ -1,4 +1,11 @@
-﻿using ProjetoOficinaWeb.Data.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
+using ProjetoOficinaWeb.Data.Entities;
 using ProjetoOficinaWeb.Helpers;
 using ProjetoOficinaWeb.Models;
 using Microsoft.AspNetCore.Http;
@@ -6,14 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace ProjetoOficinaWeb.Controllers
 {
@@ -62,7 +62,6 @@ namespace ProjetoOficinaWeb.Controllers
         {
             return View();
         }
-
 
         [HttpPost]
         public async Task<IActionResult> RegisterClient(RegisterNewUserViewModel model)
@@ -116,10 +115,8 @@ namespace ProjetoOficinaWeb.Controllers
                     }
 
                     ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
-
                 }
             }
-
             return View(model);
         }
 
@@ -162,7 +159,6 @@ namespace ProjetoOficinaWeb.Controllers
                     }
                 }
             }
-
             return BadRequest();
         }
 
@@ -182,11 +178,8 @@ namespace ProjetoOficinaWeb.Controllers
             var result = await _userHelper.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
             {
-
             }
-
             return View();
-
         }
 
         // GET: Clients/Details/5
@@ -215,7 +208,6 @@ namespace ProjetoOficinaWeb.Controllers
                 model.PostalCode = customer.PostalCode;
                 model.TaxNumber = customer.TaxNumber;
             }
-
             return View(customer);
         }
 
@@ -223,7 +215,6 @@ namespace ProjetoOficinaWeb.Controllers
         public async Task<IActionResult> Edit(string? id)
         {
             var user = await _userHelper.GetUserByIdAsync(id.ToString());
-
             var model = new RegisterNewUserViewModel();
             if (user != null)
             {
@@ -235,7 +226,6 @@ namespace ProjetoOficinaWeb.Controllers
                 model.PostalCode = user.PostalCode;
                 model.ImageUrl = user.ImageUrl;
             }
-
             return View(model);
         }
 
@@ -290,37 +280,43 @@ namespace ProjetoOficinaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("Error404"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
             }
 
             var client = await _userManager.FindByIdAsync(id);
             if (client == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("Error404"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
             }
-
-            await _userManager.DeleteAsync(client);
-            return RedirectToAction(nameof(Index));
+            return View(client);
         }
 
-        //// POST: Clients/Delete/5
-        //[HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(string id) // o id é obrigatório
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // POST: Clients/Delete/5
+        [HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id) // o id é obrigatório
+        {
+            var client = await _userManager.FindByIdAsync(id); // o id é verficado para ver se ainda existe
 
-        //    var customer = await _userHelper.GetUserByIdAsync(id);
-        //    if (customer == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (id == null)
+            {
+                return new NotFoundViewResult("Error404"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
+            }
+            try
+            {
+                await _userManager.DeleteAsync(client);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    ViewBag.ErrorTitle = $"{client.Email} is being used!!";
+                    ViewBag.ErrorMessage = $"{client.Email} it´s not possible to delete because there are appointments with this user.</br></br>";
+                }
 
-        //    await _userManager.DeleteAsync(customer);
-        //    return RedirectToAction(nameof(Index));
-        //}
+                return View("Error");
+            }
+        }
     }
 }

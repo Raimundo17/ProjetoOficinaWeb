@@ -68,6 +68,7 @@ namespace ProjetoOficinaWeb
             services.AddScoped<IConverterHelper, ConverterHelper>();
             services.AddScoped<IVehicleRepository, VehicleRepository>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
+            services.AddScoped<IRepairRepository, RepairRepository>();
             services.AddControllersWithViews();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 

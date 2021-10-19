@@ -14,6 +14,8 @@ namespace ProjetoOficinaWeb.Data
 
         public DbSet<Appointment> Appointments { get; set; }
 
+        public DbSet<Repair> Repairs { get; set; }
+
         public DbSet<AppointmentDetail> AppointmentDetails { get; set; }
 
         public DbSet<AppointmentDetailTemp> AppointmentDetailsTemp { get; set; }

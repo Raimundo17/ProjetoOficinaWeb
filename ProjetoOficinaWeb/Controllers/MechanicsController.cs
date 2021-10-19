@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ProjetoOficinaWeb.Data.Entities;
@@ -61,7 +62,6 @@ namespace ProjetoOficinaWeb.Controllers
         {
             return View();
         }
-
 
         [HttpPost]
         [Authorize(Roles ="Admin")]
@@ -119,7 +119,6 @@ namespace ProjetoOficinaWeb.Controllers
 
                 }
             }
-
             return View(model);
         }
 
@@ -162,7 +161,6 @@ namespace ProjetoOficinaWeb.Controllers
                     }
                 }
             }
-
             return BadRequest();
         }
 
@@ -244,7 +242,6 @@ namespace ProjetoOficinaWeb.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [Authorize]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(RegisterNewUserMechanicViewModel model, string id)
@@ -295,37 +292,43 @@ namespace ProjetoOficinaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("Error404"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
             }
 
             var mechanic = await _userManager.FindByIdAsync(id);
             if (mechanic == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("Error404"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
             }
-
-            await _userManager.DeleteAsync(mechanic);
-            return RedirectToAction(nameof(Index));
+            return View(mechanic);
         }
 
-        //// POST: Mechanics/Delete/5
-        //[HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(string id) // o id é obrigatório
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // POST: Clients/Delete/5
+        [HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id) // o id é obrigatório
+        {
+            var mechanic = await _userManager.FindByIdAsync(id); // o id é verficado para ver se ainda existe
 
-        //    var customer = await _userHelper.GetUserByIdAsync(id);
-        //    if (customer == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (id == null)
+            {
+                return new NotFoundViewResult("Error404"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
+            }
+            try
+            {
+                await _userManager.DeleteAsync(mechanic);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    ViewBag.ErrorTitle = $"{mechanic.Email} is being used!!";
+                    ViewBag.ErrorMessage = $"{mechanic.Email} it´s not possible to delete because there are appointments with this user.</br></br>";
+                }
 
-        //    await _userManager.DeleteAsync(customer);
-        //    return RedirectToAction(nameof(Index));
-        //}
+                return View("Error");
+            }
+        }
     }
 }

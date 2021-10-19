@@ -1,15 +1,19 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using ProjetoOficinaWeb.Data.Entities;
 
 namespace ProjetoOficinaWeb.Models
 {
-    public class RepairViewModel
+    public class RepairViewModel : Repair
     {
-        public int Id { get; set; }
+        public IEnumerable<SelectListItem> Appointments { get; set; }
 
+        public IEnumerable<Repair> RepairDate { get; set; }
 
-        [Display(Name = "Delivery date")]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
-        public DateTime RepairDate { get; set; }
+        public IEnumerable<SelectListItem> Services { get; set; }
+
+        public IEnumerable<SelectListItem> Vehicles { get; set; }
+
+        public IEnumerable<SelectListItem> Users { get; set; }
     }
 }

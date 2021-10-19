@@ -24,7 +24,6 @@ namespace ProjetoOficinaWeb.Data
         public async Task SeedAsync()
         {
             await _context.Database.MigrateAsync(); // ver se a base de dados está criada (o seed ao correr cria a tabela das migrações)
-
             await _userHelper.CheckRoleAsync("Admin");
             await _userHelper.CheckRoleAsync("Customer");
             await _userHelper.CheckRoleAsync("Mechanic");
@@ -43,9 +42,8 @@ namespace ProjetoOficinaWeb.Data
                     ImageUrl = "~/wwwroot/images/Admin/avatar-2.jpg"
                 };
 
-                var result = await _userHelper.AddUserAsync(user, "123456");
-                // os dois paramentros a passar é o user e a password á parte do objeto para poder ser
-                // encriptada
+                var result = await _userHelper.AddUserAsync(user, "123456");// os dois paramentros a passar é o user e a password á parte do objeto para poder ser encriptada
+                
                 if (result != IdentityResult.Success) // se houve algum problema a criar
                 {
                     throw new InvalidOperationException("Could not create the user in seeder");
@@ -61,17 +59,6 @@ namespace ProjetoOficinaWeb.Data
             {
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
             }
-
-            //if (!_context.Vehicles.Any()) // se nao existirem veículos
-            //{
-            //    AddVehicle("22-GG-44", "Opel", "Astra", "White", user);
-            //    AddVehicle("07-DF-21", "Fiat", "500", "Red", user);
-            //    AddVehicle("89-XX-37", "Toyota", "Yaris", "Grey", user);
-            //    AddVehicle("15-PR-12", "Renault", "Clio", "Blue", user);
-            //    AddVehicle("57-QP-56", "Ford", "Focus", "White", user);
-            //    AddVehicle("06-TB-44", "Volkswagen", "Golf", "Yellow", user);
-            //    await _context.SaveChangesAsync(); // grava na base de dados
-            //}
 
             if (!_context.Services.Any()) // se nao existirem serviços
             {
@@ -90,19 +77,6 @@ namespace ProjetoOficinaWeb.Data
                 await _context.SaveChangesAsync(); // grava na base de dados
             }
         }
-
-        //private void AddVehicle(string licensePlate, string brand, string model, string color, User user)
-        //{
-        //    _context.Vehicles.Add(new Vehicle
-        //    {
-        //        LicensePlate = licensePlate,
-        //        Brand = brand,
-        //        Model = model,
-        //        Color = color,
-        //        Year = _random.Next(1995, 2020),
-        //        User = user
-        //    });
-        //}
 
         private void AddService(string description, int price)
         {

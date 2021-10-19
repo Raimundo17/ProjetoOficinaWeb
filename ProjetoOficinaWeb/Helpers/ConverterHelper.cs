@@ -16,7 +16,8 @@ namespace ProjetoOficinaWeb.Helpers
                 Model = model.Model,
                 Color = model.Color,
                 Year = model.Year,
-                User = model.User
+                UserId = model.UserId.ToString()
+                
             };
         }
 
@@ -31,7 +32,7 @@ namespace ProjetoOficinaWeb.Helpers
                 Model = vehicle.Model,
                 Color = vehicle.Color,
                 Year = vehicle.Year,
-                User = vehicle.User
+                UserId = vehicle.UserId
             };
         }
 
@@ -52,6 +53,29 @@ namespace ProjetoOficinaWeb.Helpers
                 Id = service.Id,
                 Description = service.Description,
                 Price = service.Price,
+            };
+        }
+
+        public Repair ToRepair(RepairViewModel model, string path, bool isNew)
+        {
+            return new Repair
+            {
+                Id = model.Id,
+                Vehicle = model.Vehicle,
+                Service = model.Service,
+                Appointment = model.Appointment,
+                Mechanic = model.Mechanic
+            };
+        }
+
+        public RepairViewModel ToRepairViewModel(Repair repair)
+        {
+            return new RepairViewModel
+            {
+                Id = repair.Id,
+                Vehicle = repair.Vehicle,
+                Appointment = repair.Appointment,
+                Mechanic = repair.Mechanic
             };
         }
     }

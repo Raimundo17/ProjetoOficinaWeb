@@ -27,10 +27,10 @@ namespace ProjetoOficinaWeb.Controllers
         // GET: Vehicles
         public async Task<IActionResult> Index()
         {
-            /*  return View(_vehicleRepository.GetAll().OrderBy(p => p.Brand));*/ // trás todos os veículos, ordenados pela marca
+           return View (_vehicleRepository.GetAll().OrderBy(p => p.Brand)); // trás todos os veículos, ordenados pela marca
 
-            var model = await _vehicleRepository.GetVehicleAsync(this.User.Identity.Name); // Cada utilizador só vê o seu veículo
-            return View(model);
+            //var model = await _vehicleRepository.GetVehicleAsync(this.User.Identity.Name); // Cada utilizador só vê o seu veículo
+            //return View(model);
         }                                                                  
 
 
@@ -56,14 +56,14 @@ namespace ProjetoOficinaWeb.Controllers
         // GET: Vehicles/Create
         public IActionResult Create() // Abrir a view do create (aquela janela que aparece assim que carregamos no botao do create new)
         {
-            return View();
+            //return View();
 
-            //var model = new VehicleViewModel
-            //{
-            //    Users = _vehicleRepository.GetComboUser()
-            //};
+            var model = new VehicleViewModel
+            {
+                Users = _userHelper.GetComboUsers()
+            };
 
-            //return View(model);
+            return View(model);
         }
 
         // Este Post corresponde ao botão create que aparece em baixo quando acabamos de preencher a informacao do novo veículo, Recebe o modelo e envia para a base de dados
@@ -88,7 +88,13 @@ namespace ProjetoOficinaWeb.Controllers
                 var vehicle = _converterHelper.ToVehicle(modell, path, true); // é true porque é novo (create)
 
                 //TODO : Modificar para o user que tiver logado
-                vehicle.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); // dá o utilizador que estiver "logado"
+                //vehicle.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); // dá o utilizador que estiver "logado"
+
+                var model = new VehicleViewModel
+                {
+                    Users = _userHelper.GetComboUsers(),
+                };
+
                 await _vehicleRepository.CreateAsync(vehicle); // recebe o veículo
                 return RedirectToAction(nameof(Index)); // redireciona para a action index (mostra a lista de veículos)
             }
@@ -149,7 +155,7 @@ namespace ProjetoOficinaWeb.Controllers
                     var vehicle = _converterHelper.ToVehicle(modell, path, false); // o bool é false porque não é novo (edit)
 
                     //TODO : Modificar para o user que tiver logado
-                    vehicle.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); // dá o utilizador que estiver "logado"
+                    //vehicle.UserId = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); // dá o utilizador que estiver "logado"
                     await _vehicleRepository.UpdateAsync(vehicle); // faz o update do veículo
                 }
                 catch (DbUpdateConcurrencyException)
@@ -169,8 +175,7 @@ namespace ProjetoOficinaWeb.Controllers
         }
 
         // GET: Vehicles/Delete/5 // Só mostra o que for para apagar. Não apaga
-        [Authorize(Roles = "Receptionist")]
-        [Authorize(Roles = "Mechanic")]
+        [Authorize(Roles = "Receptionist, Mechanic")]
         public async Task<IActionResult> Delete(int? id) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
         {
             if (id == null)
@@ -188,15 +193,29 @@ namespace ProjetoOficinaWeb.Controllers
         }
 
         // POST: Vehicles/Delete/5
-        [Authorize(Roles = "Admin")]
-        [Authorize(Roles = "Mechanic")]
+        [Authorize(Roles = "Receptionist, Mechanic")]
         [HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id) // o id é obrigatório
         {
             var vehicle = await _vehicleRepository.GetByIdAsync(id); ; // o id é verficado para ver se ainda existe
-            await _vehicleRepository.DeleteAsync(vehicle); //remover em memória
-            return RedirectToAction(nameof(Index));
+            
+            try
+            {
+                await _vehicleRepository.DeleteAsync(vehicle); //remover em memória
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    ViewBag.ErrorTitle = $"{vehicle.LicensePlate} is being used!!";
+                    ViewBag.ErrorMessage = $"{vehicle.LicensePlate} it´s not possible to delete because there are appointments with this vehicle.</br></br>";
+                }
+
+                return View("Error");
+            }
         }
 
         public IActionResult Error404()

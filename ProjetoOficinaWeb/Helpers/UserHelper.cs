@@ -119,15 +119,30 @@ namespace ProjetoOficinaWeb.Helpers
 
         public IEnumerable<SelectListItem> GetComboUsers()
         {
+            //var list = _userManager.GetUsersInRoleAsync("Customer");
+            //var list2 = list.Select(p => new SelectListItem
+            //{
+            //    Text = p.Email,
+            //    Value = p.Id.ToString()
+            //}).ToList();
+
+            //list2.Insert(0, new SelectListItem
+            //{
+            //    Text = ("Select a customer..."),
+            //    Value = "0"
+            //});
+
+            //return list2;
+
             var list = _userManager.Users.Select(p => new SelectListItem
             {
-                Text = p.FullName,
+                Text = p.Email,
                 Value = p.Id.ToString()
             }).ToList();
 
             list.Insert(0, new SelectListItem
             {
-                Text = ("Select a costumer..."),
+                Text = ("Select a customer..."),
                 Value = "0"
             });
 

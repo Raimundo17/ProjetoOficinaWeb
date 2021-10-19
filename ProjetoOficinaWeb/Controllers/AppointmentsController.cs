@@ -1,8 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProjetoOficinaWeb.Data;
+using ProjetoOficinaWeb.Helpers;
 using ProjetoOficinaWeb.Models;
 
 namespace ProjetoOficinaWeb.Controllers
@@ -34,7 +35,6 @@ namespace ProjetoOficinaWeb.Controllers
             return View(model);
         }
 
-        
         public IActionResult AddVehicle()
         {
             var model = new AddItemViewModel
@@ -107,7 +107,6 @@ namespace ProjetoOficinaWeb.Controllers
             return RedirectToAction("Create");
         }
 
-
         public async Task<IActionResult> Repair(int? id)
         {
             if (id == null)
@@ -124,12 +123,11 @@ namespace ProjetoOficinaWeb.Controllers
             var model = new RepairViewModel
             {
                 Id = order.Id,
-                RepairDate = DateTime.Today
+                //RepairDate = DateTime.Today
             };
 
             return View(model);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Repair(RepairViewModel model)
@@ -141,6 +139,50 @@ namespace ProjetoOficinaWeb.Controllers
             }
 
             return View();
+        }
+
+        // GET: Appointments/Delete/5 // Só mostra o que for para apagar. Não apaga
+        [Authorize(Roles = "Receptionist, Mechanic")]
+        public async Task<IActionResult> Delete(int? id) // O ? permite que o id seja opcional de forma a que mesmo que o id vá vazio (url) o programa não "rebente"
+        {
+            if (id == null)
+            {
+                return new NotFoundViewResult("Error404"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
+            }
+
+            var appointment = await _appointmentRepository.GetByIdAsync(id.Value);
+            if (appointment == null)
+            {
+                return new NotFoundViewResult("Error404"); // passo a minha view ; genérico dá para produtos, clientes, fornecedores, etc
+            }
+
+            return View(appointment);
+        }
+
+        // POST: Appointments/Delete/5
+        [Authorize(Roles = "Receptionist, Mechanic")]
+        [HttpPost, ActionName("Delete")] // quando houver um action chamada "Delete" mas que seja com um Post faz o DeleteConfirmed
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id) // o id é obrigatório
+        {
+            var appointment = await _appointmentRepository.GetByIdAsync(id); ; // o id é verficado para ver se ainda existe
+
+            try
+            {
+                await _appointmentRepository.DeleteAsync(appointment); //remover em memória
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    ViewBag.ErrorTitle = $"{appointment.AppointmentDate} is being used!!";
+                    ViewBag.ErrorMessage = $"{appointment.AppointmentDate} it´s not possible to delete</br></br>";
+                }
+
+                return View("Error");
+            }
         }
     }
 }

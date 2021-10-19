@@ -1,11 +1,11 @@
-﻿using ProjetoOficinaWeb.Data.Entities;
-using ProjetoOficinaWeb.Helpers;
-using ProjetoOficinaWeb.Models;
-using System;
+﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using ProjetoOficinaWeb.Data.Entities;
+using ProjetoOficinaWeb.Helpers;
+using ProjetoOficinaWeb.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +28,6 @@ namespace ProjetoOficinaWeb.Controllers
             _mailHelper = mailHelper;
             _configuration = configuration;
         }
-
 
         public IActionResult Login()
         {
@@ -128,7 +127,6 @@ namespace ProjetoOficinaWeb.Controllers
                     }
 
                     ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
-
                 }
             }
             return View(model);
@@ -154,7 +152,6 @@ namespace ProjetoOficinaWeb.Controllers
             }
 
             return View();
-
         }
 
         [HttpPost]
@@ -192,7 +189,6 @@ namespace ProjetoOficinaWeb.Controllers
                         };
 
                         return this.Created(string.Empty, results);
-
                     }
                 }
             }
@@ -200,46 +196,45 @@ namespace ProjetoOficinaWeb.Controllers
             return BadRequest();
         }
 
-        //-----------------------------RECOVER PASSWORD W/TOKEN
         public IActionResult RecoverPassword()
         {
             return View();
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
-        //{
-        //    if (this.ModelState.IsValid)
-        //    {
-        //        var user = await _userHelper.GetUserByEmailAsync(model.Email);
-        //        if (user == null)
-        //        {
-        //            ModelState.AddModelError(string.Empty, "The email doesn't correspont to a registered user.");
-        //            return View(model);
-        //        }
+        [HttpPost]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+        {
+            if (this.ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "The email doesn't correspont to a registered user.");
+                    return View(model);
+                }
 
-        //        var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+                var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
 
-        //        var link = this.Url.Action(
-        //            "ResetPassword",
-        //            "User",
-        //            new { token = myToken }, protocol: HttpContext.Request.Scheme);
+                var link = this.Url.Action(
+                    "ResetPassword",
+                    "User",
+                    new { token = myToken }, protocol: HttpContext.Request.Scheme);
 
-        //        Response response = _mailHelper.SendEmail(model.Email, "Shop Password Reset", $"<h1>Shop Password Reset</h1>" +
-        //        $"To reset the password click in this link:</br></br>" +
-        //        $"<a href = \"{link}\">Reset Password</a>");
+                Response response = _mailHelper.SendEmail(model.Email, "Shop Password Reset", $"<h1>Shop Password Reset</h1>" +
+                $"To reset the password click in this link:</br></br>" +
+                $"<a href = \"{link}\">Reset Password</a>");
 
-        //        if (response.IsSuccess)
-        //        {
-        //            this.ViewBag.Message = "The instructions to recover your password has been sent to email.";
-        //        }
+                if (response.IsSuccess)
+                {
+                    this.ViewBag.Message = "The instructions to recover your password has been sent to email.";
+                }
 
-        //        return this.View();
+                return this.View();
 
-        //    }
+            }
 
-        //    return this.View(model);
-        //}
+            return this.View(model);
+        }
 
         public IActionResult RegisterMechanic()
         {

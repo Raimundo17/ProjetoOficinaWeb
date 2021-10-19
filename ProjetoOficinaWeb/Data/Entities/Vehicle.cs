@@ -21,7 +21,9 @@ namespace ProjetoOficinaWeb.Data.Entities
 
         public int? Year { get; set; } // ? -> o required field validator desaparece
 
-        public User User { get; set; } // cria uma relação de 1 para muitos (um user pode ter vários produtos)
+        public User Email { get; set; } // Ligação de muitos para 1
+
+        public string UserId { get; set; } // cria uma relação de 1 para muitos (um user pode ter vários produtos)
                                        // quem foi o user que colocou aquele produto
 
         public string ImageFullPath

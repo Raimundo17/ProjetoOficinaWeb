@@ -17,16 +17,13 @@ namespace ProjetoOficinaWeb.Helpers
 
         Task LogoutAsync();
 
-
         Task CheckRoleAsync(string roleName); // verifica se tem um determinado role se nao tiver cria
 
         Task AddUserToRoleAsync(User user, string roleName); // adiciona um role a um determinado user
 
         Task<bool> IsUserInRoleAsync(User user, string roleName); // verifica se o user já tem este role ou nao
 
-
         Task<SignInResult> ValidatePasswordAsync(User user, string password);
-
 
         Task<string> GenerateEmailConfirmationTokenAsync(User user);
 
@@ -34,11 +31,9 @@ namespace ProjetoOficinaWeb.Helpers
 
         Task<User> GetUserByIdAsync(string userId); // dou o email e dá uma string (Bypass)
 
-
         Task<string> GeneratePasswordResetTokenAsync(User user);
 
         Task<IdentityResult> ResetPasswordAsync(User user, string token, string password);
-
 
         Task<IdentityResult> UpdateUserAsync(User user); // muda o primeiro e o último nome
 

@@ -26,12 +26,13 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Login" class="btn btn-primary" />
-                    <a asp-action="Register" class="btn btn-primary">Register New User</a>
+                <button asp-action="RecoverPassword" type="submit" class="btn btn-default">Recover Password</button>
+                <a asp-action="Register" class="btn btn-primary">Register New User</a>
             </div>
         </form>
     </div>
 </div>
 
-@section Scripts {
+@*@section Scripts {
         @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+}*@

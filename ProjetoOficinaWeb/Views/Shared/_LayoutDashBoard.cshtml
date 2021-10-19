@@ -38,12 +38,12 @@ License URL: https://creativecommons.org/licenses/by/4.0/
     ======================================================-->
     <header class="header">
         <nav class="navbar navbar-expand-lg ">
-            <div class="search-box">
+            @*<div class="search-box">
                 <button class="dismiss"><i class="icon-close"></i></button>
                 <form id="searchForm" action="#" role="search">
                     <input type="search" placeholder="Search Now" class="form-control">
                 </form>
-            </div>
+            </div>*@
             <div class="container-fluid ">
                 <div class="navbar-holder d-flex align-items-center justify-content-between">
                     <div class="navbar-header">
@@ -62,13 +62,13 @@ License URL: https://creativecommons.org/licenses/by/4.0/
 
                 <ul class="nav-menu list-unstyled d-flex flex-md-row align-items-md-center">
                     <!-- Expand-->
-                    <li class="nav-item d-flex align-items-center full_scr_exp"><a class="nav-link" href="#"><img src="~/admin/img/expand.png" onclick="toggleFullScreen(document.body)" class="img-fluid" alt=""></a></li>
+                    @*<li class="nav-item d-flex align-items-center full_scr_exp"><a class="nav-link" href="#"><img src="~/admin/img/expand.png" onclick="toggleFullScreen(document.body)" class="img-fluid" alt=""></a></li>*@
                     <!-- Search-->
-                    <li class="nav-item d-flex align-items-center"><a id="search" class="nav-link" href="#"><i class="icon-search"></i></a></li>
+                    @*<li class="nav-item d-flex align-items-center"><a id="search" class="nav-link" href="#"><i class="icon-search"></i></a></li>*@
                     <!-- Notifications-->
-                    <li class="nav-item dropdown">
-                        <a id="notifications" class="nav-link" rel="nofollow" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell-o"></i><span class="noti-numb-bg"></span><span class="badge">12</span></a>
-                        <ul aria-labelledby="notifications" class="dropdown-menu">
+                    @*<li class="nav-item dropdown">*@
+                        @*<a id="notifications" class="nav-link" rel="nofollow" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell-o"></i><span class="noti-numb-bg"></span><span class="badge">12</span></a>*@
+                        @*<ul aria-labelledby="notifications" class="dropdown-menu">
                             <li>
                                 <a rel="nofollow" href="#" class="dropdown-item nav-link">
                                     <div class="notification">
@@ -102,10 +102,10 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                                 </a>
                             </li>
                             <li><a rel="nofollow" href="#" class="dropdown-item all-notifications text-center"> <strong>view all notifications                                            </strong></a></li>
-                        </ul>
-                    </li>
+                        </ul>*@
+                    @*</li>*@
                     <!-- Messages                        -->
-                    <li class="nav-item dropdown">
+                    @*<li class="nav-item dropdown">
                         <a id="messages" class="nav-link logout" rel="nofollow" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-envelope-o"></i><span class="noti-numb-bg"></span><span class="badge">10</span></a>
                         <ul aria-labelledby="messages" class="dropdown-menu">
                             <li>
@@ -134,15 +134,15 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                             </li>
                             <li><a rel="nofollow" href="#" class="dropdown-item all-notifications text-center"> <strong>Read all messages    </strong></a></li>
                         </ul>
-                    </li>
+                    </li>*@
                     <li class="nav-item dropdown">
-                        <a id="profile" class="nav-link logout" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="xxxxxxxx" alt="..." class="img-fluid rounded-circle" style="height: 30px; width: 30px;"></a>
+                        <a id="profile" class="nav-link logout" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="~/images/Admin/avatar-2.jpg" alt="..." class="img-fluid rounded-circle" style="height: 30px; width: 30px;"></a>
                         <ul aria-labelledby="profile" class="dropdown-menu profile">
                             <li>
                                 <a rel="nofollow" href="#" class="dropdown-item d-flex">
-                                    <div class="msg-profile"> <img src="xxxxxx" alt="..." class="img-fluid rounded-circle"></div>
+                                    <div class="msg-profile"> <img src="~/images/Admin/avatar-2.jpg" alt="..." class="img-fluid rounded-circle"></div>
                                     <div class="msg-body">
-                                        <h3 class="h5">Steena Ben</h3><span>@this.User.Identity.Name</span>
+                                        @*<h3 class="h5">Steena Ben</h3>*@<span>@this.User.Identity.Name</span>
                                     </div>
                                 </a>
                                 <hr>
@@ -185,8 +185,10 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                             <div class="notification">
                                 <a class="notification-content" asp-area="" asp-controller="Appointments" asp-action="Index">Appointments</a>
                             </div>
-                                }
-                                        </li>
+                            <div class="notification">
+                                 <a class="notification-content" asp-area="" asp-controller="Repairs" asp-action="Index">Repairs</a>
+                            </div>}
+                            </li>
                             <li>
                                 <div class="notification">
                                     <a class="notification-content" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
@@ -194,19 +196,19 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-item d-flex align-items-center"><a id="menu-toggle-right" class="nav-link" href="#"><i class="fa fa-bars"></i></a></li>
-                    <nav id="sidebar-wrapper">
+                    @*<li class="nav-item d-flex align-items-center"><a id="menu-toggle-right" class="nav-link" href="#"><i class="fa fa-bars"></i></a></li>*@
+                    <!--<nav id="sidebar-wrapper">
                         <div class="sidebar-nav">
-                            <div class="tab" role="tabpanel">
-                                <ul class="nav nav-tabs" role="tablist">
+                            <div class="tab" role="tabpanel">-->
+                                @*<ul class="nav nav-tabs" role="tablist">
                                     <li class="nav-item ">
                                         <a class="nav-link active" href="#live" role="tab" data-toggle="tab"><i class="fa fa-globe"></i> Live</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" href="#trend" role="tab" data-toggle="tab"><i class="fa fa-rocket"></i> Trending</a>
                                     </li>
-                                </ul>
-                                <div class="tab-content tabs">
+                                </ul>*@
+                                @*<div class="tab-content tabs">
                                     <div role="tabpanel" class="tab-pane fade show active" id="live">
                                         <h3>Connect Live</h3>
                                         <div class="content newsf-list">
@@ -290,9 +292,9 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                    </nav>
+                                </div>*@
+                            <!--</div>
+                    </nav>-->
                 </ul>
             </div>
         </nav>
@@ -306,14 +308,14 @@ License URL: https://creativecommons.org/licenses/by/4.0/
 
         <!--***** SIDE NAVBAR *****-->
         <nav class="side-navbar">
-            <div class="sidebar-header d-flex align-items-center">
+            @*<div class="sidebar-header d-flex align-items-center">
                 <div class="avatar"><img src="img/avatar-1.jpg" alt="..." class="img-fluid rounded-circle"></div>
                 <div class="title">
                     <h1 class="h4">
                         XXXXX
                     </h1>
                 </div>
-            </div>
+            </div>*@
             <hr>
             <!-- Sidebar Navidation Menus-->
             <ul class="list-unstyled">
@@ -354,7 +356,7 @@ License URL: https://creativecommons.org/licenses/by/4.0/
                     {
             <li> <a href="tables.html"> <i class="icon-grid"></i>Invoice </a></li>
                             <li> <a href="tables.html"> <i class="icon-grid"></i>Repairs </a></li>
-                    }
+                            <li>  <a class="notification-content" asp-area="" asp-controller="Repairs" asp-action="Index">Repairs</a></li>}
                                             <li>
                                                 @if (this.User.IsInRole("Mechanic") || this.User.IsInRole("Receptionist"))
                                                 {

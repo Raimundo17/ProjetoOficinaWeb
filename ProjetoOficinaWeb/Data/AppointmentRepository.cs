@@ -129,7 +129,7 @@ namespace ProjetoOficinaWeb.Data
                 return;
             }
 
-            appointment.RepairDate = model.RepairDate;
+          //  appointment.RepairDate = model.RepairDate;
             _context.Appointments.Update(appointment);
             await _context.SaveChangesAsync();
         }
